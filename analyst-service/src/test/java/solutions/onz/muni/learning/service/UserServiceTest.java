@@ -3,16 +3,21 @@ package solutions.onz.muni.learning.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 import solutions.onz.muni.learning.api.dto.UserDtos.ChangePasswordRequest;
 import solutions.onz.muni.learning.api.dto.UserDtos.CreateUserRequest;
+import solutions.onz.muni.learning.api.dto.UserDtos.UpdateProfileRequest;
 import solutions.onz.muni.learning.api.dto.UserDtos.UpdateUserRequest;
 import solutions.onz.muni.learning.domain.AppUser;
 import solutions.onz.muni.learning.domain.Role;
 import solutions.onz.muni.learning.repository.AppUserRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,5 +85,106 @@ class UserServiceTest {
 
         assertThat(updated.getRole()).isEqualTo(Role.ADMIN);
         assertThat(updated.isEnabled()).isFalse();
+    }
+
+    @Test
+    void findByLoginFindsUserByEmail() {
+        AppUser user = existingUser();
+        when(repository.findByEmailIgnoreCase("jane@local.test")).thenReturn(Optional.of(user));
+
+        Optional<AppUser> found = service.findByLogin("jane@local.test");
+
+        assertThat(found).isPresent().contains(user);
+    }
+
+    @Test
+    void findByLoginFallsBackToUsernameWhenEmailNotFound() {
+        AppUser user = existingUser();
+        when(repository.findByEmailIgnoreCase("jane")).thenReturn(Optional.empty());
+        when(repository.findByUsernameIgnoreCase("jane")).thenReturn(Optional.of(user));
+
+        Optional<AppUser> found = service.findByLogin("jane");
+
+        assertThat(found).isPresent().contains(user);
+    }
+
+    @Test
+    void listDelegatestoRepositoryFindAll() {
+        AppUser user1 = existingUser();
+        AppUser user2 = new AppUser();
+        user2.setId("u2");
+        user2.setEmail("bob@local.test");
+        user2.setUsername("bob");
+        user2.setPasswordHash(passwordEncoder.encode("password123"));
+        user2.setRole(Role.ADMIN);
+        user2.setEnabled(true);
+        user2.setCreatedAt(Instant.now());
+
+        Page<AppUser> page = new PageImpl<>(List.of(user1, user2));
+        Pageable pageable = Mockito.mock(Pageable.class);
+        when(repository.findAll(pageable)).thenReturn(page);
+
+        Page<AppUser> result = service.list(pageable);
+
+        assertThat(result.getContent()).hasSize(2).contains(user1, user2);
+    }
+
+    @Test
+    void disableSetsEnabledToFalse() {
+        AppUser user = existingUser();
+        when(repository.findById("u1")).thenReturn(Optional.of(user));
+
+        service.disable("u1");
+
+        assertThat(user.isEnabled()).isFalse();
+    }
+
+    @Test
+    void updateProfileUpdatesDisplayNameWhenProvided() {
+        AppUser user = existingUser();
+        when(repository.findById("u1")).thenReturn(Optional.of(user));
+
+        AppUser updated = service.updateProfile("u1", new UpdateProfileRequest("Jane Doe", null));
+
+        assertThat(updated.getDisplayName()).isEqualTo("Jane Doe");
+    }
+
+    @Test
+    void updateProfileUpdatesAvatarUrlWhenProvided() {
+        AppUser user = existingUser();
+        when(repository.findById("u1")).thenReturn(Optional.of(user));
+
+        AppUser updated = service.updateProfile("u1", new UpdateProfileRequest(null, "https://example.com/avatar.jpg"));
+
+        assertThat(updated.getAvatarUrl()).isEqualTo("https://example.com/avatar.jpg");
+    }
+
+    @Test
+    void createHappyPathSavesUserWithHashedPasswordAndEnabled() {
+        when(repository.findByEmailIgnoreCase("new@local.test")).thenReturn(Optional.empty());
+        when(repository.findByUsernameIgnoreCase("newuser")).thenReturn(Optional.empty());
+
+        CreateUserRequest request = new CreateUserRequest("new@local.test", "newuser", "New User", "mypassword123", Role.USER);
+        AppUser created = service.create(request);
+
+        assertThat(created.getEmail()).isEqualTo("new@local.test");
+        assertThat(created.getUsername()).isEqualTo("newuser");
+        assertThat(created.getDisplayName()).isEqualTo("New User");
+        assertThat(created.getRole()).isEqualTo(Role.USER);
+        assertThat(created.isEnabled()).isTrue();
+        assertThat(created.getPasswordHash()).isNotEqualTo("mypassword123");
+        assertThat(passwordEncoder.matches("mypassword123", created.getPasswordHash())).isTrue();
+        assertThat(created.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    void changePasswordHappyPathRe_encodesAndSavesNewPassword() {
+        AppUser user = existingUser();
+        when(repository.findById("u1")).thenReturn(Optional.of(user));
+
+        service.changePassword("u1", new ChangePasswordRequest("correct-password", "newpassword456"));
+
+        assertThat(user.getPasswordHash()).isNotEqualTo(passwordEncoder.encode("correct-password"));
+        assertThat(passwordEncoder.matches("newpassword456", user.getPasswordHash())).isTrue();
     }
 }
