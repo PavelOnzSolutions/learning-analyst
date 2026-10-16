@@ -38,22 +38,28 @@ Reused from the `demon` skeleton, with all `demon`-specific domain content remov
 
 - **Removed entirely**: SRE/Operations/Knowledge Base/Tasks/Sandbox pages and routes, the notifications bell + `WebSocketContext`, the language switcher + locale-fetch query, the Microsoft/OAuth2 login path and its callback route, the session-expiry countdown ring (no token-refresh UI needed if sessions are simple JWT with normal expiry — kept minimal).
 - **Kept**: layouts (`MainLayout`, `AuthLayout`, `ErrorLayout`), `AuthContext` (local-login only), `ThemeContext`, `ToolbarContext`, `PageTitleContext`, `TokenStore`, Radix + Tailwind setup, i18n scaffolding (but no language switcher UI exposed).
-- **New pages**: `NewImportModal`, `HistoryList`, `RunDetail` (charts + tables), `Insights` (cross-run trends), trimmed `Administration` (Users, API Docs, API Tokens only).
-- **Sidebar** (fixed top-level items): New Import (opens modal), Insights, History, Administration (Users / API Docs / API Tokens).
+- **New pages**: `NewImportModal`, `HistoryList`, `RunDetail` (charts + tables), `Insights` (cross-run trends), trimmed `Administration` (Users, API Docs, API Tokens, **Configuration**).
+- **Sidebar** (fixed top-level items): New Import (opens modal), Insights, History, Administration (Users / API Docs / API Tokens / Configuration).
+
+#### 3.3.1 Administration → Configuration (Import Settings)
+
+Mirrors `demon-webui`'s `ConfigurationPage` shape (header + `Tabs.Root`), but scoped down to what this app needs: a single **Import Settings** tab/card, not the AI/MCP/Audit tabs from `demon`. For each of the 4 file roles (Completed Trainings, Training Catalog, Training Timeslots, Employees), a `Select` for delimiter (`Auto` / `,` / `;` / Tab / `|`) with a Save button, following the same "fetch current config via query → local state → PUT on save" pattern as `demon-webui`'s `GeneralSettingsTab`.
+
+Backend: a `ImportSettings` singleton document (one row, like `demon-orchestrator`'s `TaskWatchdogConfig` pattern) with a map of file role → delimiter setting, exposed via `ImportSettingsController` (`GET`/`PUT /api/v1/admin/import-settings`), read by `CsvIngestionService` at analysis time (§4.1).
 - **Navbar**: Theme toggle, Accent color picker, Background picker (existing 2 backgrounds), avatar menu (Profile / Settings / Logout). Nothing else.
 
 ## 4. CSV Ingestion & Analysis Rules
 
 ### 4.1 Per-file parsing
 
-| File role | Expected delimiter (sniffed, not assumed) | Expected encoding (detected, not assumed) |
+| File role | Expected delimiter (sniffed by default) | Expected encoding (detected, not assumed) |
 |---|---|---|
 | Training Catalog (`katalog_skoleni.csv`) | `,` | UTF-8 |
 | Employees (`zamestnanci.csv`) | `,` | UTF-8 |
 | Training Timeslots (`terminy_skoleni.csv`) | `;` | UTF-8 |
 | Completed Trainings (`absolvovana_skoleni.csv`) | `;` | Windows-1250 (fallback) |
 
-The app must not hard-code delimiter/encoding per role — it detects both per uploaded file, since the whole point of the analysis step is tolerating real-world export inconsistency.
+By default the app does not hard-code delimiter per role — it sniffs the header row of each uploaded file. An admin can override this per role from **Administration → Configuration → Import Settings** (§3.3.1): each of the 4 file roles gets a delimiter setting of `Auto` (sniff, default), `,`, `;`, `\t`, or `|`. When a role's setting is not `Auto`, `CsvIngestionService` uses it directly and skips sniffing for that role; a delimiter mismatch against the actual file content (e.g. configured as `,` but the file is clearly `;`-delimited, producing a single-column parse) is reported as a WARNING rather than silently failing. Encoding remains auto-detected only (not configurable), since the spec only called out delimiter configuration.
 
 ### 4.2 Field-level validation rules
 
