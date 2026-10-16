@@ -9,8 +9,8 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import solutions.onz.muni.learning.config.ApplicationProperties;
 import solutions.onz.muni.learning.domain.AppUser;
 
 import java.security.interfaces.RSAPublicKey;
@@ -25,12 +25,9 @@ public class JwtService {
     private final long expirySeconds;
     private final String issuer;
 
-    public JwtService(
-            @Value("${analyst.jwt.issuer}") String issuer,
-            @Value("${analyst.jwt.expiry-seconds}") long expirySeconds
-    ) {
-        this.issuer = issuer;
-        this.expirySeconds = expirySeconds;
+    public JwtService(ApplicationProperties properties) {
+        this.issuer = properties.getJwt().getIssuer();
+        this.expirySeconds = properties.getJwt().getExpirySeconds();
         log.warn("Generating an ephemeral in-memory RSA signing key for local-account JWTs. " +
                 "Sessions and API tokens will not survive a service restart.");
         try {

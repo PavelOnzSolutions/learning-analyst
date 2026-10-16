@@ -2,6 +2,7 @@ package solutions.onz.muni.learning.service;
 
 import com.nimbusds.jwt.SignedJWT;
 import org.junit.jupiter.api.Test;
+import solutions.onz.muni.learning.config.ApplicationProperties;
 import solutions.onz.muni.learning.domain.AppUser;
 import solutions.onz.muni.learning.domain.Role;
 
@@ -11,7 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class JwtServiceTest {
 
-    private final JwtService jwtService = new JwtService("learning-analyst", 1800);
+    private final ApplicationProperties applicationProperties = new ApplicationProperties();
+    private final JwtService jwtService = new JwtService(applicationProperties);
 
     private AppUser sampleUser() {
         AppUser user = new AppUser();
