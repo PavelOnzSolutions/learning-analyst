@@ -1,0 +1,10 @@
+build/
+.gradle/
+**/build/
+**/.gradle/
+.idea/
+*.iml
+.git/
+docs/
+TODO.md
+compose.yaml

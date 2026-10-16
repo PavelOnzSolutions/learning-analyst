@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: analyst-service
+  threads:
+    virtual:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  profiles:
+    default: local
+  mongodb:
+    database: ${SPRING_DATA_MONGODB_DATABASE:analyst}
+    uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/analyst}
+  data:
+    mongodb:
+      auto-index-creation: true
+
+springdoc:
+  api-docs:
+    enabled: true
+    resolve-extensions-properties: true
+    resolve-schema-properties: true
+  show-actuator: true
+  swagger-ui:
+    syntax-highlight:
+      activated: true
