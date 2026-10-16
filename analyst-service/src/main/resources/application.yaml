@@ -26,3 +26,14 @@ springdoc:
   swagger-ui:
     syntax-highlight:
       activated: true
+
+analyst:
+  jwt:
+    issuer: learning-analyst
+    expiry-seconds: 1800
+  admin:
+    email: ${ANALYST_ADMIN_EMAIL:admin@local.test}
+    username: ${ANALYST_ADMIN_USERNAME:admin}
+    password: ${ANALYST_ADMIN_PASSWORD:ChangeMe123!}
+  frontend:
+    base-url: ${ANALYST_FRONTEND_BASE_URL:http://localhost:5173}
