@@ -7,13 +7,12 @@ import {
   Dialog,
   Flex,
   Progress,
-  ScrollArea,
   Select,
   Table,
   Text,
   TextField
 } from '@radix-ui/themes';
-import {Ban, Check, Copy, Key, LifeBuoy, Plus, RefreshCw, Trash2} from 'lucide-react';
+import {Ban, Check, Copy, Key, Plus, RefreshCw, Trash2} from 'lucide-react';
 import PageHeader from '../../components/layout/PageHeader';
 import {useToolbar} from '../../context/ToolbarContext';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -23,13 +22,11 @@ import {usePageTitle} from '../../context/PageTitleContext';
 import {CreateTokenRequest, CreateTokenResponse, IApiToken} from '../../models/api-token.model';
 import {fetchWithAuth} from '../../utils/api';
 import {DraggableDialogContent} from '../../components/system/DraggableDialogContent.tsx';
-import PermissionSelector from '../../components/system/PermissionSelector';
-import {useAuth} from '../../context/AuthContext';
 
 const fetchApiTokens = async (): Promise<IApiToken[]> => {
     const response = await fetchWithAuth('/v1/tokens');
     if (!response.ok) {
-        throw new Error('Network response was not ok: Status ' + response.statusText.toString() + ', ' + response.status.toString() + ', ' + response.url.toString());
+        throw new Error('Failed to fetch API tokens: ' + response.status);
     }
     return response.json();
 };
@@ -64,19 +61,18 @@ const deleteApiTokens = async (ids: string[]) => {
     }
 };
 
+const SESSION_TOKEN_DESCRIPTIONS = ['local-login', 'token-refresh'];
+
 const ApiTokens = () => {
-    const { user } = useAuth();
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [tokenDisplayDialogOpen, setTokenDisplayDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [newTokenName, setNewTokenName] = useState('');
     const [newTokenExpiration, setNewTokenExpiration] = useState('30');
-    const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
     const [generatedToken, setGeneratedToken] = useState<CreateTokenResponse | null>(null);
     const [copied, setCopied] = useState(false);
     const [hideUserSessions, setHideUserSessions] = useState(true);
-    const [helpDialogOpen, setHelpDialogOpen] = useState(false);
     const { showToast } = useToast();
     const queryClient = useQueryClient();
 
@@ -93,7 +89,6 @@ const ApiTokens = () => {
             setTokenDisplayDialogOpen(true);
             setNewTokenName('');
             setNewTokenExpiration('30');
-            setSelectedPermissions([]);
             queryClient.invalidateQueries({ queryKey: ['api-tokens'] });
             showToast('Token created successfully', 'success');
         },
@@ -131,7 +126,7 @@ const ApiTokens = () => {
 
     const filteredTokens = tokens?.filter(token => {
         if (hideUserSessions) {
-            return !['local-login', 'oauth2-login', 'token-refresh'].includes(token.description)
+            return !SESSION_TOKEN_DESCRIPTIONS.includes(token.description);
         }
         return true;
     });
@@ -160,7 +155,6 @@ const ApiTokens = () => {
         createMutation.mutate({
             name: newTokenName || 'API Token',
             expirationDays: parseInt(newTokenExpiration) || 30,
-            permissions: selectedPermissions,
         });
     };
 
@@ -319,9 +313,7 @@ const ApiTokens = () => {
                         </label>
 
                         <label>
-                            <Text as="div" size="2" mb="1" weight="bold">
-                                Expiration
-                            </Text>
+                            <Text as="div" size="2" mb="1" weight="bold">Expiration</Text>
                             <Select.Root value={newTokenExpiration} onValueChange={setNewTokenExpiration}>
                                 <Select.Trigger placeholder="Select expiration..." />
                                 <Select.Content>
@@ -333,18 +325,6 @@ const ApiTokens = () => {
                                 </Select.Content>
                             </Select.Root>
                         </label>
-
-                        <Box>
-                            <Text as="div" size="2" mb="1" weight="bold">
-                                {t('lbl_permissions', 'Permissions')}
-                            </Text>
-                            <PermissionSelector
-                                selected={selectedPermissions}
-                                onChange={setSelectedPermissions}
-                                maxHeight={200}
-                                allowedPermissions={allowedPermissions}
-                            />
-                        </Box>
                     </Flex>
 
                     <Flex gap="3" mt="4" justify="end">
@@ -407,9 +387,7 @@ const ApiTokens = () => {
 
                     <Flex gap="3" mt="4" justify="end">
                         <Dialog.Close>
-                            <Button variant="soft" color="gray">
-                                Cancel
-                            </Button>
+                            <Button variant="soft" color="gray">Cancel</Button>
                         </Dialog.Close>
                         <Button variant="solid" color="red" onClick={confirmDelete} disabled={deleteMutation.isPending}>
                             <Trash2 className="w-5 h-5" />
@@ -419,20 +397,7 @@ const ApiTokens = () => {
                 </DraggableDialogContent>
             </Dialog.Root>
 
-            <Dialog.Root open={helpDialogOpen} onOpenChange={setHelpDialogOpen}>
-                <DraggableDialogContent maxWidth="1000px" maxHeight="90vh" title={t('btn_help', 'Help')}>
-                    <ScrollArea style={{ flex: 1, minHeight: 0 }} type="auto">
-                        <ApiTokensHelp />
-                    </ScrollArea>
-                    <Flex gap="3" mt="4" justify="end">
-                        <Dialog.Close>
-                            <Button variant="soft" color="gray" onClick={() => setHelpDialogOpen(false)}>
-                                {t('btn_close', 'Close')}
-                            </Button>
-                        </Dialog.Close>
-                    </Flex>
-                </DraggableDialogContent>
-            </Dialog.Root>
+            <Box />
         </Card>
     );
 };
