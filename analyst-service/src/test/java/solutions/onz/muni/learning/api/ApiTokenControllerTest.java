@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import solutions.onz.muni.learning.domain.ApiToken;
 import solutions.onz.muni.learning.domain.AppUser;
 import solutions.onz.muni.learning.domain.Role;
 import solutions.onz.muni.learning.repository.AppUserRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -54,6 +56,17 @@ class ApiTokenControllerTest {
         return user;
     }
 
+    private ApiToken apiToken(String id, String userId) {
+        ApiToken token = new ApiToken();
+        token.setId(id);
+        token.setUserId(userId);
+        token.setDescription("Test token");
+        token.setIssuedAt(Instant.now());
+        token.setExpiresAt(Instant.now().plusSeconds(3600));
+        token.setRevoked(false);
+        return token;
+    }
+
     @Test
     void listWithoutTokenIsUnauthorized() throws Exception {
         mockMvc.perform(get("/api/v1/tokens"))
@@ -62,11 +75,15 @@ class ApiTokenControllerTest {
 
     @Test
     void listReturnsOnlyCallersTokens() throws Exception {
-        when(apiTokenRepository.findByUserId("u2")).thenReturn(List.of());
+        ApiToken token = apiToken("token-123", "u2");
+        when(apiTokenRepository.findByUserId("u2")).thenReturn(List.of(token));
 
         mockMvc.perform(get("/api/v1/tokens").with(asUser("u2", "USER")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value("token-123"));
+
+        verify(apiTokenRepository).findByUserId("u2");
     }
 
     @Test
