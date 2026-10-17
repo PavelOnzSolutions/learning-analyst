@@ -67,6 +67,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             setUser(updatedUser);
             TokenStore.setToken(tokenResponse.token);
+            TokenStore.setUser(JSON.stringify({
+                id: updatedUser.id, username: updatedUser.username, email: updatedUser.email,
+                role: updatedUser.role, imageUrl: updatedUser.imageUrl,
+            }));
             setTokenExpiration(decoded.exp);
             setTokenIssuedAt(decoded.iat);
 

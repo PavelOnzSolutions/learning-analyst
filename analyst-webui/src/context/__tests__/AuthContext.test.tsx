@@ -71,4 +71,51 @@ describe('AuthContext', () => {
         await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
         expect(result.current.isAdmin).toBe(false);
     });
+
+    it('refreshToken persists updated role to localStorage when role changes', async () => {
+        const now = Math.floor(Date.now() / 1000);
+        const initialToken = makeToken('u3', now + 3600, now);
+        const refreshedToken = makeToken('u3', now + 7200, now);
+
+        // Seed localStorage with initial token and user (ADMIN role)
+        localStorage.setItem('token', initialToken);
+        localStorage.setItem('user', JSON.stringify({
+            id: 'u3', username: 'bob', email: 'bob@local.test',
+            role: 'ADMIN', imageUrl: undefined,
+        }));
+
+        mockFetch.mockImplementation((url: string) => {
+            if (url === `${config.apiBaseUrl}/v1/auth/refresh`) {
+                // Simulate role change: ADMIN → USER
+                return okJson({
+                    token: refreshedToken,
+                    expiresIn: 3600,
+                    user: { id: 'u3', username: 'bob', email: 'bob@local.test', role: 'USER' },
+                });
+            }
+            return okJson({});
+        });
+
+        const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+
+        // Wait for initial load from localStorage
+        await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
+        expect(result.current.isAdmin).toBe(true); // Initially ADMIN
+        expect(result.current.user?.role).toBe('ADMIN');
+
+        // Call refreshToken
+        await act(async () => {
+            await result.current.refreshToken();
+        });
+
+        // Verify in-memory state updated
+        await waitFor(() => expect(result.current.isAdmin).toBe(false));
+        expect(result.current.user?.role).toBe('USER');
+
+        // Verify localStorage was persisted with new role
+        const storedUserJson = localStorage.getItem('user');
+        expect(storedUserJson).toBeTruthy();
+        const storedUser = JSON.parse(storedUserJson!);
+        expect(storedUser.role).toBe('USER');
+    });
 });
