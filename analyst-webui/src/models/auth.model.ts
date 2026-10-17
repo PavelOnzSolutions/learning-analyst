@@ -3,13 +3,15 @@ export interface LoginRequest {
     password: string;
 }
 
+export type UserRole = 'ADMIN' | 'USER';
+
 export interface UserInfo {
     id: string;
     email: string;
     username: string | null;
     displayName: string | null;
-    origin: string;
     avatarUrl: string | null;
+    role: UserRole;
     enabled: boolean;
     createdAt: string;
 }
@@ -25,5 +27,6 @@ export interface User {
     username: string;
     email: string;
     token: string;
+    role: UserRole;
     imageUrl?: string;
 }

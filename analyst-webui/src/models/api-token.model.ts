@@ -10,7 +10,6 @@ export interface IApiToken {
 export interface CreateTokenRequest {
     name: string;
     expirationDays?: number;
-    permissions?: string[];
 }
 
 export interface CreateTokenResponse {

@@ -7,10 +7,10 @@ import { TokenStore } from '../utils/TokenStore';
 interface AuthContextType {
     user: User | null;
     login: (data: LoginRequest) => Promise<void>;
-    loginWithMicrosoft: () => void;
     logout: () => void;
     refreshToken: () => Promise<void>;
     isAuthenticated: boolean;
+    isAdmin: boolean;
     isLoading: boolean;
     tokenExpiration: number | null;
     tokenIssuedAt: number | null;
@@ -18,7 +18,6 @@ interface AuthContextType {
 
 interface JwtPayload {
     sub: string;
-    email?: string;
     exp: number;
     iat: number;
 }
@@ -40,7 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [tokenExpiration, setTokenExpiration] = useState<number | null>(null);
     const [tokenIssuedAt, setTokenIssuedAt] = useState<number | null>(null);
 
-    // Token refresh function
     const refreshToken = useCallback(async () => {
         const currentToken = TokenStore.getToken();
         if (!currentToken) return;
@@ -64,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const updatedUser: User = {
                 ...user!,
                 token: tokenResponse.token,
+                role: tokenResponse.user.role,
             };
 
             setUser(updatedUser);
@@ -114,42 +113,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [user?.token]);
 
     useEffect(() => {
-        // Check for token in URL (OAuth2 callback)
-        const params = new URLSearchParams(window.location.search);
-        const urlToken = params.get('token');
-        const urlUserId = params.get('userId');
-        const urlUsername = params.get('username');
-        const urlImageUrl = params.get('imageUrl');
-
-        if (urlToken) {
-            let email = '';
-            let decoded: JwtPayload | undefined;
-            try {
-                decoded = jwtDecode<JwtPayload>(urlToken);
-                email = decoded.email || '';
-            } catch (e) {
-                console.error('Failed to decode token', e);
-            }
-
-            const newUser: User = {
-                id: urlUserId || 'unknown',
-                username: urlUsername || 'Generic User',
-                email,
-                token: urlToken,
-                imageUrl: urlImageUrl || undefined,
-            };
-            setTokenExpiration(decoded?.exp ?? null);
-            setTokenIssuedAt(decoded?.iat ?? null);
-            setUser(newUser);
-            TokenStore.setToken(newUser.token);
-            TokenStore.setUser(JSON.stringify({ id: newUser.id, username: newUser.username, email: newUser.email, imageUrl: newUser.imageUrl }));
-
-            window.history.replaceState({}, document.title, window.location.pathname);
-            setIsLoading(false);
-            return;
-        }
-
-        // Check for existing token in localStorage on mount
         const storedToken = TokenStore.getToken();
         const storedUser = TokenStore.getUser();
 
@@ -191,6 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 username: tokenResponse.user.username || tokenResponse.user.email,
                 email: tokenResponse.user.email,
                 token: tokenResponse.token,
+                role: tokenResponse.user.role,
                 imageUrl: tokenResponse.user.avatarUrl || undefined,
             };
 
@@ -198,14 +162,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setTokenIssuedAt(decoded.iat);
             setUser(newUser);
             TokenStore.setToken(newUser.token);
-            TokenStore.setUser(JSON.stringify({ id: newUser.id, username: newUser.username, email: newUser.email, imageUrl: newUser.imageUrl }));
+            TokenStore.setUser(JSON.stringify({
+                id: newUser.id, username: newUser.username, email: newUser.email,
+                role: newUser.role, imageUrl: newUser.imageUrl,
+            }));
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const loginWithMicrosoft = () => {
-        window.location.href = `${config.baseUrl}/oauth2/authorization/azure`;
     };
 
     const logout = () => {
@@ -214,8 +177,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         const currentToken = TokenStore.getToken();
         if (currentToken) {
-            // Best-effort: revoke the session server-side so the token can't be replayed
-            // after logout. Local state is cleared regardless of whether this succeeds.
             fetch(`${config.apiBaseUrl}/v1/auth/logout`, {
                 method: 'POST',
                 headers: {
@@ -233,10 +194,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         <AuthContext.Provider value={{
             user,
             login,
-            loginWithMicrosoft,
             logout,
             refreshToken,
             isAuthenticated: !!user,
+            isAdmin: user?.role === 'ADMIN',
             isLoading,
             tokenExpiration,
             tokenIssuedAt
