@@ -3,7 +3,6 @@ package solutions.onz.muni.learning.api.dto;
 import solutions.onz.muni.learning.domain.AppUser;
 import solutions.onz.muni.learning.domain.Role;
 
-
 public final class UserDtos {
 
     private UserDtos() {

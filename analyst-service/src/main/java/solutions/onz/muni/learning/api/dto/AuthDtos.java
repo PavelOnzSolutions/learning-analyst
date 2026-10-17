@@ -1,10 +1,11 @@
 package solutions.onz.muni.learning.api.dto;
 
-import lombok.NoArgsConstructor;
 import solutions.onz.muni.learning.api.dto.UserDtos.UserResponse;
 
-@NoArgsConstructor
 public final class AuthDtos {
+
+    private AuthDtos() {
+    }
 
     public record LoginRequest(String login, String password) {
     }

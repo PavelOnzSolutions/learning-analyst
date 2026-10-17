@@ -1,10 +1,12 @@
 package solutions.onz.muni.learning.api.dto;
 
-import lombok.NoArgsConstructor;
 import solutions.onz.muni.learning.domain.ApiToken;
 
-@NoArgsConstructor
 public final class ApiTokenDtos {
+
+    private ApiTokenDtos() {
+    }
+
     public record CreateTokenRequest(String name, Integer expirationDays) {
     }
 
