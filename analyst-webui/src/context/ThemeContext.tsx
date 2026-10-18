@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 export type AccentColor = 'gray' | 'gold' | 'bronze' | 'brown' | 'yellow' | 'amber' | 'orange' | 'tomato' | 'red' | 'ruby' | 'crimson' | 'pink' | 'plum' | 'purple' | 'violet' | 'iris' | 'indigo' | 'blue' | 'cyan' | 'teal' | 'jade' | 'green' | 'grass' | 'lime' | 'mint' | 'sky';
-export type BackgroundType = 'orbs' | 'mesh' | 'waves' | 'particles' | 'plasma' | 'starfield';
+export type BackgroundType = 'orbs' | 'starfield';
 export type DefaultFont = 'Macondo' | 'Poppins' | 'Sansation' | 'Space Grotesk' | 'Titillium Web' | 'VT323';
 export type CodeFont = 'Fira Code' | 'Syne Mono' | 'Space Mono';
 export type ElementEdgeRadius = 'none' | 'small' | 'medium' | 'large' | 'full';
@@ -82,7 +82,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     });
 
     const [accentColor, setAccentColor] = useState<AccentColor>(() => {
-        return (localStorage.getItem('accentColor') as AccentColor) || 'hell';
+        return (localStorage.getItem('accentColor') as AccentColor) || 'indigo';
     });
 
     const [backgroundType, setBackgroundType] = useState<BackgroundType>(() => {
