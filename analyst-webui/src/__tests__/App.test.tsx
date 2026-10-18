@@ -44,6 +44,6 @@ describe('App', () => {
             </Theme>
         );
 
-        await waitFor(() => expect(screen.getAllByText(/Insights/i).length).toBeGreaterThan(0));
+        await waitFor(() => expect(screen.getByText(/Compliance and capacity trends across all completed import runs/i)).toBeInTheDocument());
     });
 });
