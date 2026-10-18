@@ -73,4 +73,29 @@ class UserControllerTest {
         mockMvc.perform(get("/api/v1/users/me"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void adminCanGetUserById() throws Exception {
+        when(userRepository.findById("u2")).thenReturn(Optional.of(plainUser()));
+
+        mockMvc.perform(get("/api/v1/users/u2").with(asUser("admin-id", "ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.id").value("u2"))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.username").value("jane"));
+    }
+
+    @Test
+    void plainUserGetUserByIdIsForbidden() throws Exception {
+        mockMvc.perform(get("/api/v1/users/u2").with(asUser("u2", "USER")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void createUserWithMissingFieldsReturns400NotServerError() throws Exception {
+        mockMvc.perform(post("/api/v1/users")
+                        .with(asUser("admin-id", "ADMIN"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"new@local.test\"}"))
+                .andExpect(status().isBadRequest());
+    }
 }

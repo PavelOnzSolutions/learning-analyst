@@ -1,6 +1,7 @@
 package solutions.onz.muni.learning.api;
 
 import com.nimbusds.jose.JOSEException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class AuthController {
     private final ApiTokenService apiTokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         AppUser user = userService.findByLogin(request.login()).orElse(null);
         if (user == null || !user.isEnabled() || !userService.validatePassword(user, request.password())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");

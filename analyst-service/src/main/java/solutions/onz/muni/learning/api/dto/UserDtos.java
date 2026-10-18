@@ -1,5 +1,9 @@
 package solutions.onz.muni.learning.api.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import solutions.onz.muni.learning.domain.AppUser;
 import solutions.onz.muni.learning.domain.Role;
 
@@ -8,7 +12,13 @@ public final class UserDtos {
     private UserDtos() {
     }
 
-    public record CreateUserRequest(String email, String username, String displayName, String password, Role role) {
+    public record CreateUserRequest(
+            @NotBlank @Email String email,
+            @NotBlank @Size(min = 3) String username,
+            String displayName,
+            @NotBlank @Size(min = 8) String password,
+            @NotNull Role role
+    ) {
     }
 
     public record UpdateUserRequest(Role role, Boolean enabled) {
@@ -17,7 +27,7 @@ public final class UserDtos {
     public record UpdateProfileRequest(String displayName, String avatarUrl) {
     }
 
-    public record ChangePasswordRequest(String currentPassword, String newPassword) {
+    public record ChangePasswordRequest(@NotBlank String currentPassword, @NotBlank @Size(min = 8) String newPassword) {
     }
 
     public record UserResponse(

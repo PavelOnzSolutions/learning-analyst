@@ -1,5 +1,6 @@
 package solutions.onz.muni.learning.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +25,15 @@ public class UserController {
         return userService.list(pageable).map(UserResponse::from);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> get(@PathVariable String id) {
+        AppUser user = userService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return ResponseEntity.ok(UserResponse.from(user));
+    }
+
     @PostMapping
-    public ResponseEntity<UserResponse> create(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest request) {
         AppUser user = userService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.from(user));
     }
@@ -55,7 +63,7 @@ public class UserController {
     }
 
     @PutMapping("/me/password")
-    public ResponseEntity<Void> changePassword(Authentication authentication, @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<Void> changePassword(Authentication authentication, @Valid @RequestBody ChangePasswordRequest request) {
         userService.changePassword(authentication.getName(), request);
         return ResponseEntity.ok().build();
     }

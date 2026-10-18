@@ -79,4 +79,12 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/v1/auth/refresh"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void loginWithMissingPasswordReturns400NotServerError() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"login\":\"admin\"}"))
+                .andExpect(status().isBadRequest());
+    }
 }
