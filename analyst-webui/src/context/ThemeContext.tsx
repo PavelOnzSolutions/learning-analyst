@@ -99,7 +99,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     });
 
     const [defaultFont, setDefaultFont] = useState<DefaultFont>(() => {
-        return (localStorage.getItem('defaultFont') as DefaultFont) || 'Space Grotesk';
+        return (localStorage.getItem('defaultFont') as DefaultFont) || 'Sansation';
     });
 
     const [codeFont, setCodeFont] = useState<CodeFont>(() => {
