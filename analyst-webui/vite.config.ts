@@ -34,7 +34,7 @@ export default defineConfig({
   test: {
     projects: [
     {
-      extends: true,
+      extends: true as const,
       test: {
         name: 'unit',
         environment: 'jsdom',
@@ -43,7 +43,7 @@ export default defineConfig({
       },
     },
     ...(hasStorybook ? [{
-      extends: true,
+      extends: true as const,
       plugins: [
       // The plugin will run tests for the stories defined in your Storybook config
       // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
@@ -57,7 +57,7 @@ export default defineConfig({
           headless: true,
           provider: playwright({}),
           instances: [{
-            browser: 'chromium'
+            browser: 'chromium' as const
           }]
         },
         setupFiles: ['.storybook/vitest.setup.ts']
