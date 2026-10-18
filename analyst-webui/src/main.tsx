@@ -21,38 +21,18 @@ export const setToastFunction = (fn: (message: string, type?: 'error' | 'success
     toastFn = fn;
 };
 
-import { getAddNotificationFunction } from './context/WebSocketContext';
-
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
             retry: 1,
-            // TODO: Fix deprecated symbol
             onError: (error: any) => {
                 const message = error?.message?.toString() || 'An error occurred while fetching data';
-                const status = error?.response?.status || error?.status; // Adjust based on your fetcher's error structure
-                const endpoint = error?.response?.config?.url || error?.config?.url;
+                const status = error?.response?.status || error?.status;
 
-                // Generate Notification
-                const addNotification = getAddNotificationFunction();
-                if (addNotification) {
-                    addNotification({
-                        id: crypto.randomUUID(),
-                        type: 'ERROR',
-                        payload: { message: `API Error: `, details: `API: ${endpoint}, Message: ${message}` },
-                        timestamp: Date.now(),
-                        read: false
-                    });
-                }
-
-                // Handle specific statuses
                 if (status === 401) {
                     window.location.href = '/login';
                 } else if (status === 403) {
                     window.location.href = '/403';
-                } else if (status === 404) {
-                    // Optional: Redirect to 404 page or just show toast
-                    // window.location.href = '/404';
                 }
 
                 toastFn?.(message, 'error');
@@ -62,19 +42,6 @@ const queryClient = new QueryClient({
             onError: (error: any) => {
                 const message = error?.message || 'An error occurred';
                 const status = error?.response?.status || error?.status;
-                const endpoint = error?.response?.config?.url || error?.config?.url;
-
-                // Generate Notification
-                const addNotification = getAddNotificationFunction();
-                if (addNotification) {
-                    addNotification({
-                        id: crypto.randomUUID(),
-                        type: 'ERROR',
-                        payload: { message: `Operation Failed: ${message}`, details: `API: ${endpoint}, Status: ${status}` },
-                        timestamp: Date.now(),
-                        read: false
-                    });
-                }
 
                 if (status === 403) {
                     window.location.href = '/403';
