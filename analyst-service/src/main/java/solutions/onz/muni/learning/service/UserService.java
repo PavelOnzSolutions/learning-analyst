@@ -23,6 +23,7 @@ public class UserService {
 
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApiTokenService apiTokenService;
 
     public Optional<AppUser> findByLogin(String login) {
         return userRepository.findByEmailIgnoreCase(login)
@@ -61,19 +62,25 @@ public class UserService {
 
     public AppUser update(String id, UpdateUserRequest request) {
         AppUser user = requireById(id);
+        boolean roleChanged = request.role() != null && request.role() != user.getRole();
         if (request.role() != null) {
             user.setRole(request.role());
         }
         if (request.enabled() != null) {
             user.setEnabled(request.enabled());
         }
-        return userRepository.save(user);
+        AppUser saved = userRepository.save(user);
+        if (roleChanged) {
+            apiTokenService.revokeAllForUser(id);
+        }
+        return saved;
     }
 
     public void disable(String id) {
         AppUser user = requireById(id);
         user.setEnabled(false);
         userRepository.save(user);
+        apiTokenService.revokeAllForUser(id);
     }
 
     public AppUser updateProfile(String id, UpdateProfileRequest request) {

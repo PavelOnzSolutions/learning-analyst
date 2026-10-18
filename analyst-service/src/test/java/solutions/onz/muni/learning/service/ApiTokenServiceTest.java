@@ -71,4 +71,18 @@ class ApiTokenServiceTest {
         assertThat(captor.getValue()).hasSize(1);
         assertThat(captor.getValue().get(0).getId()).isEqualTo("jti-4");
     }
+
+    @Test
+    void revokeAllForUserRevokesEveryNonRevokedTokenForThatUser() {
+        ApiToken active1 = token("jti-6", "u1", false);
+        ApiToken active2 = token("jti-7", "u1", false);
+        ApiToken alreadyRevoked = token("jti-8", "u1", true);
+        when(repository.findByUserId("u1")).thenReturn(List.of(active1, active2, alreadyRevoked));
+
+        service.revokeAllForUser("u1");
+
+        assertThat(active1.isRevoked()).isTrue();
+        assertThat(active2.isRevoked()).isTrue();
+        Mockito.verify(repository, Mockito.times(2)).save(any(ApiToken.class));
+    }
 }

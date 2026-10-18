@@ -52,4 +52,13 @@ public class ApiTokenService {
                 .toList();
         apiTokenRepository.deleteAll(owned);
     }
+
+    public void revokeAllForUser(String userId) {
+        apiTokenRepository.findByUserId(userId).forEach(token -> {
+            if (!token.isRevoked()) {
+                token.setRevoked(true);
+                apiTokenRepository.save(token);
+            }
+        });
+    }
 }

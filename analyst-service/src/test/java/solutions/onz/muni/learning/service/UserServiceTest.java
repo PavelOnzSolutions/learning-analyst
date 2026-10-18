@@ -29,7 +29,8 @@ class UserServiceTest {
 
     private final AppUserRepository repository = Mockito.mock(AppUserRepository.class);
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    private final UserService service = new UserService(repository, passwordEncoder);
+    private final ApiTokenService apiTokenService = Mockito.mock(ApiTokenService.class);
+    private final UserService service = new UserService(repository, passwordEncoder, apiTokenService);
 
     private AppUser existingUser() {
         AppUser user = new AppUser();
@@ -186,5 +187,47 @@ class UserServiceTest {
 
         assertThat(user.getPasswordHash()).isNotEqualTo(passwordEncoder.encode("correct-password"));
         assertThat(passwordEncoder.matches("newpassword456", user.getPasswordHash())).isTrue();
+    }
+
+    @Test
+    void disableRevokesAllTokensForTheUser() {
+        AppUser user = existingUser();
+        when(repository.findById("u1")).thenReturn(Optional.of(user));
+
+        service.disable("u1");
+
+        Mockito.verify(apiTokenService).revokeAllForUser("u1");
+    }
+
+    @Test
+    void updateWithRoleChangeRevokesTokens() {
+        AppUser user = existingUser();
+        user.setRole(Role.USER);
+        when(repository.findById("u1")).thenReturn(Optional.of(user));
+
+        service.update("u1", new UpdateUserRequest(Role.ADMIN, null));
+
+        Mockito.verify(apiTokenService).revokeAllForUser("u1");
+    }
+
+    @Test
+    void updateWithSameRoleDoesNotRevokeTokens() {
+        AppUser user = existingUser();
+        user.setRole(Role.USER);
+        when(repository.findById("u1")).thenReturn(Optional.of(user));
+
+        service.update("u1", new UpdateUserRequest(Role.USER, null));
+
+        Mockito.verify(apiTokenService, Mockito.never()).revokeAllForUser(any());
+    }
+
+    @Test
+    void updateWithOnlyEnabledChangeDoesNotRevokeTokens() {
+        AppUser user = existingUser();
+        when(repository.findById("u1")).thenReturn(Optional.of(user));
+
+        service.update("u1", new UpdateUserRequest(null, false));
+
+        Mockito.verify(apiTokenService, Mockito.never()).revokeAllForUser(any());
     }
 }
