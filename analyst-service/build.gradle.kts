@@ -50,6 +50,9 @@ dependencies {
     implementation("org.apache.tika:tika-parsers-standard-package:4.0.0")
     implementation("org.jsoup:jsoup:1.23.2")
 
+    // CSV parsing
+    implementation("org.apache.commons:commons-csv:1.14.1")
+
     // Markdown → HTML (used when API clients request htmlOutput=true)
     implementation("org.commonmark:commonmark:0.24.0")
 
@@ -61,6 +64,8 @@ dependencies {
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+    testImplementation(libs.testcontainers.mongodb)
+    testImplementation(libs.testcontainers.junit)
 
 }
 
