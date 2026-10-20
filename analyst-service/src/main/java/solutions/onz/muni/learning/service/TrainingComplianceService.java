@@ -62,7 +62,7 @@ public class TrainingComplianceService {
         LocalDate expiry;
         if (mostRecent.getPlatnostDo() != null) {
             expiry = mostRecent.getPlatnostDo();
-        } else if (entry.getPlatnostMesicu() == null) {
+        } else if (entry.getPlatnostMesicu() == null || entry.getPlatnostMesicu() == 0) {
             return ComplianceStatus.COMPLIANT;
         } else if (mostRecent.getDatumAbsolvovani() != null) {
             expiry = mostRecent.getDatumAbsolvovani().plusMonths(entry.getPlatnostMesicu());

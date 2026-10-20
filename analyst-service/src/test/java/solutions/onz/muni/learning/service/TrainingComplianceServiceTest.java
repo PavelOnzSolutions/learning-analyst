@@ -84,6 +84,17 @@ class TrainingComplianceServiceTest {
     }
 
     @Test
+    void zeroValidityMonthsTrainingIsCompliantOnceCompleted() {
+        RunEmployee employee = employee("E1", "Any", "Any", "aktivní");
+        RunTrainingCatalogEntry entry = catalogEntry("LEAD", 0, "POZICE:Vedoucí");
+        RunCompletedTraining training = completed("E1", "LEAD", LocalDate.of(2019, 1, 24), null);
+
+        ComplianceStatus status = service.classify(employee, entry, List.of(training), asOf);
+
+        assertThat(status).isEqualTo(ComplianceStatus.COMPLIANT);
+    }
+
+    @Test
     void expiringWithinSixtyDaysIsExpiringSoon() {
         RunEmployee employee = employee("E1", "Any", "Any", "aktivní");
         RunTrainingCatalogEntry entry = catalogEntry("GDPR", 36, "VSICHNI");
