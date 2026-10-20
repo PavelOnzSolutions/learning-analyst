@@ -17,10 +17,11 @@ public class SanitizationService {
     private static final Pattern RODNE_CISLO_FORMAT = Pattern.compile("^\\d{6}/?\\d{3,4}$");
 
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE.withResolverStyle(ResolverStyle.STRICT);
-    private static final DateTimeFormatter CZECH_SPACED = DateTimeFormatter.ofPattern("d. M. yyyy").withResolverStyle(ResolverStyle.LENIENT);
-    private static final DateTimeFormatter CZECH_SPACED_PADDED = DateTimeFormatter.ofPattern("dd. MM. yyyy").withResolverStyle(ResolverStyle.LENIENT);
-    private static final DateTimeFormatter CZECH_DOTTED = DateTimeFormatter.ofPattern("d.M.yyyy").withResolverStyle(ResolverStyle.LENIENT);
-    private static final DateTimeFormatter CZECH_DOTTED_PADDED = DateTimeFormatter.ofPattern("dd.MM.yyyy").withResolverStyle(ResolverStyle.LENIENT);
+    // Note: "uuuu" (proleptic YEAR) is used instead of "yyyy" (YEAR_OF_ERA) because
+    // ResolverStyle.STRICT requires an explicit era to resolve YEAR_OF_ERA, which these
+    // inputs never provide; "uuuu" resolves under STRICT without needing one.
+    private static final DateTimeFormatter CZECH_SPACED = DateTimeFormatter.ofPattern("d. M. uuuu").withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter CZECH_DOTTED = DateTimeFormatter.ofPattern("d.M.uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     public String sanitizeText(String raw) {
         if (raw == null) {
@@ -57,26 +58,9 @@ public class SanitizationService {
             return Optional.empty();
         }
         String trimmed = raw.trim();
-
-        // Try ISO format with STRICT resolver
-        try {
-            return Optional.of(LocalDate.parse(trimmed, ISO));
-        } catch (DateTimeParseException ignored) {
-            // try the next format
-        }
-
-        // For custom Czech formats, use LENIENT parsing but validate by re-formatting
-        DateTimeFormatter[] formatters = {
-            CZECH_SPACED, CZECH_SPACED_PADDED,
-            CZECH_DOTTED, CZECH_DOTTED_PADDED
-        };
-        for (DateTimeFormatter formatter : formatters) {
+        for (DateTimeFormatter formatter : new DateTimeFormatter[]{ISO, CZECH_SPACED, CZECH_DOTTED}) {
             try {
-                LocalDate parsed = LocalDate.parse(trimmed, formatter);
-                // Validate that the re-formatted date matches the original (rejects overflow)
-                if (trimmed.equals(parsed.format(formatter))) {
-                    return Optional.of(parsed);
-                }
+                return Optional.of(LocalDate.parse(trimmed, formatter));
             } catch (DateTimeParseException ignored) {
                 // try the next format
             }

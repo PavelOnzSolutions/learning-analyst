@@ -48,6 +48,12 @@ class SanitizationServiceTest {
     }
 
     @Test
+    void parseFlexibleDateAcceptsMixedPaddingWithSingleFormatter() {
+        assertThat(service.parseFlexibleDate("7.1.2019")).contains(LocalDate.of(2019, 1, 7));
+        assertThat(service.parseFlexibleDate("07.01.2019")).contains(LocalDate.of(2019, 1, 7));
+    }
+
+    @Test
     void parseFlexibleDateRejectsCalendarInvalidDates() {
         assertThat(service.parseFlexibleDate("31. 9. 2026")).isEmpty();
         assertThat(service.parseFlexibleDate("not a date")).isEmpty();
