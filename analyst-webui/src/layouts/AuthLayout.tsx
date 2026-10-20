@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type CSSProperties } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
 import { usePageTitle } from '../context/PageTitleContext';
 import { useTheme, AccentColor, accentColors } from '../context/ThemeContext';
@@ -7,13 +7,13 @@ import {Sun, Moon, Palette, Paintbrush} from 'lucide-react';
 import { getHueFromAccentColor } from '../utils/color-utils.ts';
 // import DotGrid from '../ux-feats/DotGrid';
 
-type BackgroundType = 'none' | 'forest';
+type BackgroundType = 'none' | 'orbs';
 
 const AuthLayout = () => {
     usePageTitle('Sign in');
     const { appearance, toggleTheme, setAccentColor, accentColor } = useTheme();
     const [background, setBackground] = useState<BackgroundType>(() => {
-        return (localStorage.getItem('auth_bg') as BackgroundType) || 'forest';
+        return (localStorage.getItem('auth_bg') as BackgroundType) || 'orbs';
     });
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const lastMotionSource = useRef<'mouse' | 'gyro' | null>(null);
@@ -23,7 +23,7 @@ const AuthLayout = () => {
     }, [background]);
 
     useEffect(() => {
-        if (background !== 'forest') {
+        if (background !== 'orbs') {
             setMousePosition({ x: 0, y: 0 });
             lastMotionSource.current = null;
             return;
@@ -72,7 +72,7 @@ const AuthLayout = () => {
 
             {/* Background transitions */}
             <div className="absolute inset-0 z-0">
-                {background === 'forest' && (
+                {background === 'orbs' && (
                     <div
                         className="absolute inset-0"
                         style={{
@@ -82,7 +82,7 @@ const AuthLayout = () => {
                         <div
                             className="auth-forest-layer auth-forest-layer-back absolute inset-0 bg-center bg-cover will-change-transform"
                             style={{
-                                backgroundImage: 'url(/assets/images/bg-auth.jpg)',
+                                backgroundImage: 'url(/assets/images/bg-auth-2.jpg)',
                                 transform: `scale(1.09) translate3d(${mousePosition.x * 6}px, ${mousePosition.y * 5}px, 0) rotateX(${mousePosition.y * -1.1}deg) rotateY(${mousePosition.x * 1.1}deg)`,
                                 transition: 'transform 150ms ease-out',
                             }}
@@ -90,7 +90,7 @@ const AuthLayout = () => {
                         <div
                             className="auth-forest-layer auth-forest-layer-mid absolute inset-0 bg-center bg-cover will-change-transform"
                             style={{
-                                backgroundImage: 'url(/assets/images/bg-auth.jpg)',
+                                backgroundImage: 'url(/assets/images/bg-auth-2.jpg)',
                                 transform: `scale(1.1) translate3d(${mousePosition.x * 12}px, ${mousePosition.y * 10}px, 0) rotateX(${mousePosition.y * -1.6}deg) rotateY(${mousePosition.x * 1.6}deg)`,
                                 transition: 'transform 120ms ease-out',
                             }}
@@ -98,7 +98,7 @@ const AuthLayout = () => {
                         <div
                             className="auth-forest-layer auth-forest-layer-front absolute inset-0 bg-center bg-cover will-change-transform"
                             style={{
-                                backgroundImage: 'url(/assets/images/bg-auth.jpg)',
+                                backgroundImage: 'url(/assets/images/bg-auth-2.jpg)',
                                 transform: `scale(1.12) translate3d(${mousePosition.x * 19}px, ${mousePosition.y * 16}px, 0) rotateX(${mousePosition.y * -2.2}deg) rotateY(${mousePosition.x * 2.2}deg)`,
                                 transition: 'transform 100ms ease-out',
                             }}
@@ -109,12 +109,6 @@ const AuthLayout = () => {
                                 backgroundColor: `hsl(${getHueFromAccentColor(accentColor)} 85% 52% / 0.38)`,
                                 mixBlendMode: 'multiply',
                             }}
-                        />
-                        <div
-                            className="auth-forest-fireflies absolute inset-0 pointer-events-none"
-                            style={{
-                                '--firefly-hue': getHueFromAccentColor(accentColor),
-                            } as CSSProperties}
                         />
                         
                     </div>
@@ -150,7 +144,7 @@ const AuthLayout = () => {
             <div className="w-full max-w-md z-10">
                 <div className="text-center mb-8">
                     <h1 className="text-5xl font-bold bg-(--accent-9) bg-clip-text text-transparent mb-2 [text-shadow:0_0_2px_var(--accent-11),0_0_5px_var(--accent-10)]">
-                        Learning Plan Analyst
+                        Learning Analyst
                     </h1>
                     <p className="text-(--gray-11) text-lg [text-shadow:0_0_2px_var(--gray-7),0_0_6px_var(--gray-9)]">
                         <strong>CSV Import &amp; Analysis</strong>
@@ -173,8 +167,8 @@ const AuthLayout = () => {
                         <DropdownMenu.Item onSelect={() => setBackground('none')}>
                             None {background === 'none' && '✓'}
                         </DropdownMenu.Item>
-                        <DropdownMenu.Item onSelect={() => setBackground('forest')}>
-                            Forest {background === 'forest' && '✓'}
+                        <DropdownMenu.Item onSelect={() => setBackground('orbs')}>
+                            Orbs {background === 'orbs' && '✓'}
                         </DropdownMenu.Item>
                     </DropdownMenu.Content>
                 </DropdownMenu.Root>

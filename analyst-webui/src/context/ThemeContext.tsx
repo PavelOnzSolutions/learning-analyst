@@ -82,7 +82,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     });
 
     const [accentColor, setAccentColor] = useState<AccentColor>(() => {
-        return (localStorage.getItem('accentColor') as AccentColor) || 'indigo';
+        return (localStorage.getItem('accentColor') as AccentColor) || 'grass';
     });
 
     const [backgroundType, setBackgroundType] = useState<BackgroundType>(() => {

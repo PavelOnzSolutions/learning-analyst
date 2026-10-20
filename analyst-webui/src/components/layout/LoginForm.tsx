@@ -29,7 +29,7 @@ const LoginForm = () => {
     };
 
     return (
-        <Card size="4" className="w-full shadow-lg">
+        <Card size="4" className="w-full shadow-lg glass">
             <form onSubmit={handleSubmit}>
                 <Flex direction="column" gap="4">
                     {error && (
