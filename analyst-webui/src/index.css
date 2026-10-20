@@ -555,7 +555,7 @@ body {
 }
 
 .glass-light {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(32px) saturate(200%);
   -webkit-backdrop-filter: blur(32px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -1549,24 +1549,24 @@ Code, .rt-Badge, .dash-icon {
   animation: forest-mist-drift 18s ease-in-out infinite alternate;
 }
 
-.auth-forest-layer {
+.auth-orbs-layer {
   transform-origin: center;
   backface-visibility: hidden;
   pointer-events: none;
 }
 
-.auth-forest-layer-back {
+.auth-orbs-layer-back {
   filter: saturate(0.9) brightness(0.92) ;
 }
 
-.auth-forest-layer-mid {
+.auth-orbs-layer-mid {
   mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 16%, rgba(0, 0, 0, 0.78) 52%, rgba(0, 0, 0, 0.88) 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 16%, rgba(0, 0, 0, 0.78) 52%, rgba(0, 0, 0, 0.88) 100%);
   filter: saturate(1.02) contrast(1.02);
   opacity: 0.92;
 }
 
-.auth-forest-layer-front {
+.auth-orbs-layer-front {
   mask-image: linear-gradient(to bottom, transparent 0%, transparent 22%, rgba(0, 0, 0, 0.48) 48%, rgba(0, 0, 0, 0.82) 75%, rgba(0, 0, 0, 1) 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 22%, rgba(0, 0, 0, 0.48) 48%, rgba(0, 0, 0, 0.82) 75%, rgba(0, 0, 0, 1) 100%);
   filter: saturate(1.08) contrast(1.08);

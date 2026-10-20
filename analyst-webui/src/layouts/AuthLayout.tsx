@@ -5,7 +5,6 @@ import { useTheme, AccentColor, accentColors } from '../context/ThemeContext';
 import { DropdownMenu } from '@radix-ui/themes';
 import {Sun, Moon, Palette, Paintbrush} from 'lucide-react';
 import { getHueFromAccentColor } from '../utils/color-utils.ts';
-// import DotGrid from '../ux-feats/DotGrid';
 
 type BackgroundType = 'none' | 'orbs';
 
@@ -80,27 +79,32 @@ const AuthLayout = () => {
                         }}
                     >
                         <div
-                            className="auth-forest-layer auth-forest-layer-back absolute inset-0 bg-center bg-cover will-change-transform"
+                            className="auth-orbs-layer auth-orbs-layer-back absolute inset-0 bg-center bg-cover will-change-transform"
                             style={{
                                 backgroundImage: 'url(/assets/images/bg-auth-2.jpg)',
                                 transform: `scale(1.09) translate3d(${mousePosition.x * 6}px, ${mousePosition.y * 5}px, 0) rotateX(${mousePosition.y * -1.1}deg) rotateY(${mousePosition.x * 1.1}deg)`,
                                 transition: 'transform 150ms ease-out',
+                                //filter: `blur(1px) ${appearance == 'light' ? 'invert(100%)' : ''}`,
+                                filter: `blur(1px)`
                             }}
                         />
                         <div
-                            className="auth-forest-layer auth-forest-layer-mid absolute inset-0 bg-center bg-cover will-change-transform"
+                            className="auth-orbs-layer auth-orbs-layer-mid absolute inset-0 bg-center bg-cover will-change-transform"
                             style={{
                                 backgroundImage: 'url(/assets/images/bg-auth-2.jpg)',
                                 transform: `scale(1.1) translate3d(${mousePosition.x * 12}px, ${mousePosition.y * 10}px, 0) rotateX(${mousePosition.y * -1.6}deg) rotateY(${mousePosition.x * 1.6}deg)`,
                                 transition: 'transform 120ms ease-out',
+                                //filter: `blur(0.5px) ${appearance == 'light' ? 'invert(100%)' : ''}`,
+                                filter: `blur(0.5px)`
                             }}
                         />
                         <div
-                            className="auth-forest-layer auth-forest-layer-front absolute inset-0 bg-center bg-cover will-change-transform"
+                            className="auth-orbs-layer auth-orbs-layer-front absolute inset-0 bg-center bg-cover will-change-transform"
                             style={{
                                 backgroundImage: 'url(/assets/images/bg-auth-2.jpg)',
                                 transform: `scale(1.12) translate3d(${mousePosition.x * 19}px, ${mousePosition.y * 16}px, 0) rotateX(${mousePosition.y * -2.2}deg) rotateY(${mousePosition.x * 2.2}deg)`,
                                 transition: 'transform 100ms ease-out',
+                                //filter: `${appearance == 'light' ? 'invert(100%)' : ''}`
                             }}
                         />
                         <div
