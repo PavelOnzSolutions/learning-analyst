@@ -91,6 +91,40 @@ class RunServiceTest {
     }
 
     @Test
+    void malformedCsvProducesErrorFindingInsteadOfThrowing() {
+        MultipartFile employees = csvFile("id_zamestnance,jmeno\n\"E1,Tereza\n"); // unterminated quote
+        MultipartFile catalog = csvFile("kod,nazev,platnost_mesicu,povinne_pro\nBOZP-Z,Test,24,VSICHNI\n");
+        MultipartFile timeslots = csvFile("id_terminu;kod_skoleni;kapacita;obsazeno\nT1;BOZP-Z;10;5\n");
+        MultipartFile completed = csvFile("id_zaznamu;id_zamestnance;kod_skoleni;datum_absolvovani\nZ1;E1;BOZP-Z;2024-01-01\n");
+
+        ImportRun run = runService.createRun("Test run", employees, catalog, timeslots, completed, "u1");
+
+        assertThat(run.getStatus()).isEqualTo(RunStatus.PENDING_REVIEW);
+        assertThat(run.getFindings())
+                .anyMatch(f -> f.file() == FileRole.EMPLOYEES && f.severity() == FindingSeverity.ERROR);
+    }
+
+    @Test
+    void missingRequiredKeyColumnProducesSingleClearFindingAndBlocksConfirm() {
+        // Wrong file uploaded into the Employees box: has headers, but none is id_zamestnance
+        MultipartFile employees = csvFile("kod,nazev\nBOZP-Z,Test\n");
+        MultipartFile catalog = csvFile("kod,nazev,platnost_mesicu,povinne_pro\nBOZP-Z,Test,24,VSICHNI\n");
+        MultipartFile timeslots = csvFile("id_terminu;kod_skoleni;kapacita;obsazeno\nT1;BOZP-Z;10;5\n");
+        MultipartFile completed = csvFile("id_zaznamu;id_zamestnance;kod_skoleni;datum_absolvovani\nZ1;E1;BOZP-Z;2024-01-01\n");
+
+        ImportRun run = runService.createRun("Test run", employees, catalog, timeslots, completed, "u1");
+
+        List<Finding> employeeFindings = run.getFindings().stream()
+                .filter(f -> f.file() == FileRole.EMPLOYEES)
+                .toList();
+        assertThat(employeeFindings).hasSize(1);
+        assertThat(employeeFindings.get(0).severity()).isEqualTo(FindingSeverity.ERROR);
+        assertThat(employeeFindings.get(0).message()).contains("id_zamestnance");
+        assertThat(run.getCounts().employees()).isEqualTo(0);
+        assertThat(run.getCounts().errorCount()).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
     void confirmRunThrowsConflictWhenErrorFindingsExist() {
         ImportRun run = new ImportRun();
         run.setId("r1");

@@ -14,16 +14,23 @@ import solutions.onz.muni.learning.service.csv.CsvIngestionService;
 import solutions.onz.muni.learning.service.csv.ParsedCsv;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class RunService {
+
+    private static final String EMPLOYEES_KEY_COLUMN = "id_zamestnance";
+    private static final String CATALOG_KEY_COLUMN = "kod";
+    private static final String TIMESLOTS_KEY_COLUMN = "id_terminu";
+    private static final String COMPLETED_TRAININGS_KEY_COLUMN = "id_zaznamu";
 
     private final CsvIngestionService csvIngestionService;
     private final ImportSettingsService importSettingsService;
@@ -54,8 +61,17 @@ public class RunService {
         allFindings.addAll(timeslotsCsv.findings());
         allFindings.addAll(completedTrainingsCsv.findings());
 
-        AnalysisResult<RunEmployee> employeeResult = employeeAnalyzer.analyze(employeesCsv.rows());
-        AnalysisResult<RunTrainingCatalogEntry> catalogResult = trainingCatalogAnalyzer.analyze(catalogCsv.rows());
+        List<Map<String, String>> employeeRows = requireKeyColumn(employeesCsv, FileRole.EMPLOYEES,
+                "Employees", EMPLOYEES_KEY_COLUMN, allFindings);
+        List<Map<String, String>> catalogRows = requireKeyColumn(catalogCsv, FileRole.TRAINING_CATALOG,
+                "Training Catalog", CATALOG_KEY_COLUMN, allFindings);
+        List<Map<String, String>> timeslotRows = requireKeyColumn(timeslotsCsv, FileRole.TIMESLOTS,
+                "Timeslots", TIMESLOTS_KEY_COLUMN, allFindings);
+        List<Map<String, String>> completedTrainingRows = requireKeyColumn(completedTrainingsCsv, FileRole.COMPLETED_TRAININGS,
+                "Completed Trainings", COMPLETED_TRAININGS_KEY_COLUMN, allFindings);
+
+        AnalysisResult<RunEmployee> employeeResult = employeeAnalyzer.analyze(employeeRows);
+        AnalysisResult<RunTrainingCatalogEntry> catalogResult = trainingCatalogAnalyzer.analyze(catalogRows);
         allFindings.addAll(employeeResult.findings());
         allFindings.addAll(catalogResult.findings());
         allFindings.addAll(trainingCatalogAnalyzer.validatePovinneProReferences(catalogResult.rows(), employeeResult.rows()));
@@ -65,9 +81,9 @@ public class RunService {
         Set<String> validEmployeeIds = employeeResult.rows().stream()
                 .map(RunEmployee::getIdZamestnance).collect(Collectors.toSet());
 
-        AnalysisResult<RunTimeslot> timeslotResult = timeslotAnalyzer.analyze(timeslotsCsv.rows(), validCodes);
+        AnalysisResult<RunTimeslot> timeslotResult = timeslotAnalyzer.analyze(timeslotRows, validCodes);
         AnalysisResult<RunCompletedTraining> completedResult =
-                completedTrainingAnalyzer.analyze(completedTrainingsCsv.rows(), validCodes, validEmployeeIds);
+                completedTrainingAnalyzer.analyze(completedTrainingRows, validCodes, validEmployeeIds);
         allFindings.addAll(timeslotResult.findings());
         allFindings.addAll(completedResult.findings());
 
@@ -112,10 +128,20 @@ public class RunService {
                     ? settings.getDelimiters().getOrDefault(role, DelimiterSetting.AUTO)
                     : DelimiterSetting.AUTO;
             return csvIngestionService.parse(file.getBytes(), role, override);
-        } catch (IOException e) {
+        } catch (IOException | UncheckedIOException e) {
             return new ParsedCsv(List.of(), List.of(), List.of(new Finding(FindingSeverity.ERROR, role, 0, null,
                     "File could not be read: " + e.getMessage())));
         }
+    }
+
+    private List<Map<String, String>> requireKeyColumn(ParsedCsv csv, FileRole role, String roleLabel,
+                                                         String keyColumn, List<Finding> findings) {
+        if (csv.headers().contains(keyColumn)) {
+            return csv.rows();
+        }
+        findings.add(new Finding(FindingSeverity.ERROR, role, 0, keyColumn,
+                roleLabel + " file is missing required column '" + keyColumn + "' — found columns: " + csv.headers()));
+        return List.of();
     }
 
     public ImportRun confirmRun(String id) {
