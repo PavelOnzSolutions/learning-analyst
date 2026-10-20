@@ -12,12 +12,16 @@ import solutions.onz.muni.learning.domain.AppUser;
 import solutions.onz.muni.learning.service.ApiTokenService;
 import solutions.onz.muni.learning.service.JwtService;
 import solutions.onz.muni.learning.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/tokens")
+@Tag(name = "API Tokens", description = "Create, list, revoke, and delete personal API tokens")
 @RequiredArgsConstructor
 public class ApiTokenController {
 
@@ -28,6 +32,8 @@ public class ApiTokenController {
     private final JwtService jwtService;
     private final UserService userService;
 
+    @Operation(summary = "List my tokens", description = "Lists all tokens (session and API) belonging to the authenticated user")
+    @ApiResponse(responseCode = "200", description = "Tokens returned")
     @GetMapping
     public List<ApiTokenResponse> list(Authentication authentication) {
         return apiTokenService.listForUser(authentication.getName()).stream()
@@ -35,6 +41,8 @@ public class ApiTokenController {
                 .toList();
     }
 
+    @Operation(summary = "Create API token", description = "Issues a new long-lived API token for the authenticated user; the raw token value is returned only in this response")
+    @ApiResponse(responseCode = "201", description = "Token created")
     @PostMapping
     public ResponseEntity<CreateTokenResponse> create(Authentication authentication, @RequestBody CreateTokenRequest request) {
         AppUser user = userService.findById(authentication.getName())
@@ -53,6 +61,9 @@ public class ApiTokenController {
                 .body(new CreateTokenResponse(saved.getId(), token, request.name(), saved.getExpiresAt().toString()));
     }
 
+    @Operation(summary = "Revoke token", description = "Revokes one of the authenticated user's own tokens by id")
+    @ApiResponse(responseCode = "200", description = "Token revoked")
+    @ApiResponse(responseCode = "404", description = "Token not found or not owned by the caller")
     @PostMapping("/{id}/revoke")
     public ResponseEntity<ApiTokenResponse> revoke(Authentication authentication, @PathVariable String id) {
         var token = apiTokenService.revokeForUser(id, authentication.getName())
@@ -60,6 +71,8 @@ public class ApiTokenController {
         return ResponseEntity.ok(ApiTokenResponse.from(token));
     }
 
+    @Operation(summary = "Delete tokens", description = "Deletes one or more of the authenticated user's own tokens by id")
+    @ApiResponse(responseCode = "204", description = "Tokens deleted")
     @DeleteMapping
     public ResponseEntity<Void> delete(Authentication authentication, @RequestParam("id") List<String> ids) {
         apiTokenService.deleteForUser(ids, authentication.getName());

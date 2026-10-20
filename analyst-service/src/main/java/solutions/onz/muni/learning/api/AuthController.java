@@ -21,12 +21,16 @@ import solutions.onz.muni.learning.domain.AppUser;
 import solutions.onz.muni.learning.service.ApiTokenService;
 import solutions.onz.muni.learning.service.JwtService;
 import solutions.onz.muni.learning.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.UUID;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Authentication", description = "Local login, session refresh, and logout")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -34,6 +38,9 @@ public class AuthController {
     private final JwtService jwtService;
     private final ApiTokenService apiTokenService;
 
+    @Operation(summary = "Log in", description = "Authenticates a local account with username/email and password, returning a session JWT")
+    @ApiResponse(responseCode = "200", description = "Login succeeded")
+    @ApiResponse(responseCode = "401", description = "Invalid credentials or disabled account")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         AppUser user = userService.findByLogin(request.login()).orElse(null);
@@ -43,6 +50,9 @@ public class AuthController {
         return ResponseEntity.ok(issueSessionToken(user, "local-login"));
     }
 
+    @Operation(summary = "Refresh session", description = "Issues a new session JWT for the currently authenticated user")
+    @ApiResponse(responseCode = "200", description = "Refresh succeeded")
+    @ApiResponse(responseCode = "401", description = "Caller is not authenticated or the account is disabled")
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refresh(Authentication authentication) {
         AppUser user = userService.findById(authentication.getName())
@@ -51,6 +61,8 @@ public class AuthController {
         return ResponseEntity.ok(issueSessionToken(user, "token-refresh"));
     }
 
+    @Operation(summary = "Log out", description = "Revokes the current session token, if any")
+    @ApiResponse(responseCode = "200", description = "Logout acknowledged (best-effort; always succeeds)")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal Jwt jwt) {
         if (jwt != null) {
