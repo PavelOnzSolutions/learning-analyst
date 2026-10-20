@@ -83,6 +83,7 @@ class RunServiceTest {
         assertThat(run.getCounts().trainingCatalogEntries()).isEqualTo(1);
         assertThat(run.getCounts().timeslots()).isEqualTo(1);
         assertThat(run.getCounts().completedTrainings()).isEqualTo(1);
+        assertThat(run.getCounts().errorCount()).isEqualTo(0);
         Mockito.verify(runEmployeeRepository).saveAll(Mockito.<List<RunEmployee>>any());
         Mockito.verify(runTrainingCatalogEntryRepository).saveAll(Mockito.<List<RunTrainingCatalogEntry>>any());
         Mockito.verify(runTimeslotRepository).saveAll(Mockito.<List<RunTimeslot>>any());
@@ -95,6 +96,17 @@ class RunServiceTest {
         run.setId("r1");
         run.setStatus(RunStatus.PENDING_REVIEW);
         run.setFindings(List.of(new Finding(FindingSeverity.ERROR, FileRole.EMPLOYEES, 1, "id_zamestnance", "Missing")));
+        when(importRunRepository.findById("r1")).thenReturn(Optional.of(run));
+
+        assertThatThrownBy(() -> runService.confirmRun("r1")).isInstanceOf(ResponseStatusException.class);
+    }
+
+    @Test
+    void confirmRunThrowsConflictWhenNotPendingReview() {
+        ImportRun run = new ImportRun();
+        run.setId("r1");
+        run.setStatus(RunStatus.COMPLETED);
+        run.setFindings(List.of());
         when(importRunRepository.findById("r1")).thenReturn(Optional.of(run));
 
         assertThatThrownBy(() -> runService.confirmRun("r1")).isInstanceOf(ResponseStatusException.class);
