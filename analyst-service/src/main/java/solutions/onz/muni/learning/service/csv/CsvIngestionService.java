@@ -27,6 +27,9 @@ public class CsvIngestionService {
     public ParsedCsv parse(byte[] content, FileRole role, DelimiterSetting override) {
         Charset charset = detectEncoding(content);
         String text = new String(content, charset);
+        if (!text.isEmpty() && text.charAt(0) == '﻿') {
+            text = text.substring(1);
+        }
 
         char delimiter = override == DelimiterSetting.AUTO ? sniffDelimiter(text) : override.toChar();
 

@@ -69,4 +69,13 @@ class CsvIngestionServiceTest {
 
         assertThat(result.rows().get(0).get("c")).isNull();
     }
+
+    @Test
+    void stripsUtf8BomBeforeParsingHeaders() {
+        String csv = "﻿" + "id_zamestnance,jmeno\nE1,Tereza\n";
+        ParsedCsv result = service.parse(csv.getBytes(StandardCharsets.UTF_8), FileRole.EMPLOYEES, DelimiterSetting.AUTO);
+
+        assertThat(result.headers()).containsExactly("id_zamestnance", "jmeno");
+        assertThat(result.rows().get(0).get("id_zamestnance")).isEqualTo("E1");
+    }
 }
