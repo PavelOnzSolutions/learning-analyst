@@ -58,4 +58,17 @@ class ImportSettingsServiceTest {
 
         assertThat(updated.getDelimiters().get(FileRole.TIMESLOTS)).isEqualTo(DelimiterSetting.PIPE);
     }
+
+    @Test
+    void updateSettingsWithEmptyMapDoesNotThrow() {
+        ImportSettings existing = new ImportSettings();
+        existing.setId("default");
+        existing.setDelimiters(new EnumMap<>(FileRole.class));
+        when(repository.findById("default")).thenReturn(Optional.of(existing));
+        when(repository.save(any(ImportSettings.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ImportSettings updated = service.updateSettings(Map.of());
+
+        assertThat(updated.getDelimiters()).isEmpty();
+    }
 }

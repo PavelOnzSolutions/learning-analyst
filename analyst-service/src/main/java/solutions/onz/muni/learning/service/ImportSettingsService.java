@@ -24,7 +24,9 @@ public class ImportSettingsService {
 
     public ImportSettings updateSettings(Map<FileRole, DelimiterSetting> delimiters) {
         ImportSettings settings = getSettings();
-        settings.setDelimiters(new EnumMap<>(delimiters));
+        Map<FileRole, DelimiterSetting> updated = new EnumMap<>(FileRole.class);
+        updated.putAll(delimiters);
+        settings.setDelimiters(updated);
         return importSettingsRepository.save(settings);
     }
 
