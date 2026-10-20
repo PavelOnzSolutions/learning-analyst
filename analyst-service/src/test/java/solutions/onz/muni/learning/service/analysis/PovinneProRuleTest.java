@@ -34,4 +34,20 @@ class PovinneProRuleTest {
         assertThat(rule.matches("ignored", "ridic")).isTrue();
         assertThat(rule.matches("ignored", "Vedoucí")).isFalse();
     }
+
+    @Test
+    void normalizedAndOriginalValuesStayIndexParallelWhenAValueNormalizesToEmpty() {
+        // U+0301 is a lone combining acute accent: a non-blank raw token that NFD
+        // decomposition + \p{M} stripping reduces to the empty string.
+        String combiningAccent = "́";
+        PovinneProRule rule = PovinneProRule.parse("UTVAR:" + combiningAccent + ";Laboratoře");
+
+        assertThat(rule.normalizedValues()).hasSameSizeAs(rule.originalValues());
+        assertThat(rule.originalValues()).containsExactly(combiningAccent, "Laboratoře");
+        assertThat(rule.normalizedValues()).containsExactly("", "laboratore");
+        // The normal token still pairs correctly by index after the empty entry.
+        assertThat(rule.originalValues().get(1)).isEqualTo("Laboratoře");
+        assertThat(rule.normalizedValues().get(1)).isEqualTo("laboratore");
+        assertThat(rule.matches("Laboratore", "ignored")).isTrue();
+    }
 }

@@ -71,9 +71,11 @@ public final class PovinneProRule {
     }
 
     private static List<String> normalize(List<String> values) {
+        // Intentionally does NOT filter out empty-after-normalization entries:
+        // normalizedValues must stay index-parallel with originalValues (see
+        // TrainingCatalogAnalyzer.validatePovinneProReferences, which pairs them by index).
         return values.stream()
                 .map(PovinneProRule::normalize)
-                .filter(v -> !v.isEmpty())
                 .collect(Collectors.toList());
     }
 
