@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import solutions.onz.muni.learning.domain.DelimiterSetting;
 import solutions.onz.muni.learning.domain.FileRole;
 import solutions.onz.muni.learning.domain.ImportSettings;
+import solutions.onz.muni.learning.repository.AppUserRepository;
 import solutions.onz.muni.learning.repository.ImportSettingsRepository;
 
 import java.util.EnumMap;
@@ -32,6 +33,9 @@ class ImportSettingsControllerTest {
 
     @MockitoBean
     private ImportSettingsRepository importSettingsRepository;
+
+    @MockitoBean
+    private AppUserRepository appUserRepository;
 
     private RequestPostProcessor asUser(String role) {
         return jwt().jwt(builder -> builder.subject("u1").claim("role", role))

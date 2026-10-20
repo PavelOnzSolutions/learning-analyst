@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import solutions.onz.muni.learning.domain.Counts;
 import solutions.onz.muni.learning.domain.ImportRun;
 import solutions.onz.muni.learning.domain.RunStatus;
+import solutions.onz.muni.learning.repository.AppUserRepository;
 import solutions.onz.muni.learning.service.RunService;
 
 import java.util.List;
@@ -36,6 +37,9 @@ class RunControllerTest {
 
     @MockitoBean
     private RunService runService;
+
+    @MockitoBean
+    private AppUserRepository appUserRepository;
 
     private RequestPostProcessor asUser(String role) {
         return jwt().jwt(builder -> builder.subject("u1").claim("role", role))
