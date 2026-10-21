@@ -17,6 +17,7 @@ import Error401 from './pages/error/Error401';
 import { AuthProvider, useAuth } from './context/AuthContext';
 // @ts-ignore
 import './App.css';
+import Metrics from "./pages/admin/metrics/Metrics.tsx";
 
 const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -51,6 +52,7 @@ function App() {
                 <Route path="/admin/api-tokens" element={<ApiTokens />} />
                 <Route path="/admin/api-docs" element={<ApiDocs />} />
                 <Route path="/admin/configuration" element={<Configuration />} />
+                <Route path="/admin/metrics" element={<Metrics />} />
 
                 <Route path="/profile" element={<UserProfile />} />
               </Route>

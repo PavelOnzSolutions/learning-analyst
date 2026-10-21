@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     LogOut, ChevronDown, ChevronRight, Users, KeyRound, FileBracesCorner,
-    ArrowBigLeft, Cog, History, LineChart, Upload, SlidersHorizontal,
+    ArrowBigLeft, Cog, History, LineChart, Upload, SlidersHorizontal, Cpu,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.tsx';
@@ -61,6 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
                 { icon: KeyRound, label: 'API Tokens', path: '/admin/api-tokens' },
                 { icon: FileBracesCorner, label: 'API Docs', path: '/admin/api-docs' },
                 { icon: SlidersHorizontal, label: 'Configuration', path: '/admin/configuration' },
+                { icon: Cpu, label:'Logs & Metrics', path: '/admin/metrics' },
             ]
         },
     ];
