@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import {
     LogOut, ChevronDown, ChevronRight, Users, KeyRound, FileBracesCorner,
-    ArrowBigLeft, Cog, History, LineChart, Upload,
+    ArrowBigLeft, Cog, History, LineChart, Upload, SlidersHorizontal,
 } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { Button, Dialog, Flex, Text } from '@radix-ui/themes';
+import { useToast } from '../../context/ToastContext.tsx';
+import { Button, Dialog, Flex } from '@radix-ui/themes';
+import NewImportModal from '../import/NewImportModal.tsx';
+import ImportResultModal from '../import/ImportResultModal.tsx';
+import type { IRunResponse } from '../../models/run.model';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -14,9 +18,13 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
     const { logout, user } = useAuth();
+    const { showToast } = useToast();
+    const navigate = useNavigate();
     const [expandedItems, setExpandedItems] = useState<string[]>([]);
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
     const [newImportOpen, setNewImportOpen] = useState(false);
+    const [resultModalOpen, setResultModalOpen] = useState(false);
+    const [activeRun, setActiveRun] = useState<IRunResponse | null>(null);
 
     const toggleExpand = (label: string) => {
         setExpandedItems(prev =>
@@ -26,6 +34,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
 
     const handleLogout = () => setLogoutDialogOpen(true);
     const confirmLogout = () => { closeSidebar(); logout(); };
+
+    const handleRunCreated = (run: IRunResponse) => {
+        setActiveRun(run);
+        setResultModalOpen(true);
+    };
+
+    const handleRunConfirmed = () => {
+        showToast('Import run confirmed', 'success');
+        navigate('/history');
+    };
+
+    const handleRunRejected = () => {
+        showToast('Import run rejected', 'success');
+    };
 
     const navItems = [
         { icon: Upload, label: 'New Import', onClick: () => setNewImportOpen(true) },
@@ -38,6 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
                 { icon: Users, label: 'Users', path: '/admin/users' },
                 { icon: KeyRound, label: 'API Tokens', path: '/admin/api-tokens' },
                 { icon: FileBracesCorner, label: 'API Docs', path: '/admin/api-docs' },
+                { icon: SlidersHorizontal, label: 'Configuration', path: '/admin/configuration' },
             ]
         },
     ];
@@ -50,7 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
 
             <aside className={`
         fixed xl:static inset-y-0 left-0 z-30
-        w-72 bg-(--sidebar-glass-bg) backdrop-blur-[50px] border-r border-[var(--glass-border)]
+        w-72 bg-(--sidebar-glass-bg) backdrop-blur-[50px] border-r border-(--glass-border)
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'}
         flex flex-col shadow-xl
@@ -145,20 +168,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
                     </Dialog.Content>
                 </Dialog.Root>
 
-                <Dialog.Root open={newImportOpen} onOpenChange={setNewImportOpen}>
-                    <Dialog.Content style={{ maxWidth: 600 }}>
-                        <Dialog.Title>New Import</Dialog.Title>
-                        <Dialog.Description size="2" mb="4">
-                            The CSV upload flow (Completed Trainings, Training Catalog, Training Timeslots, Employees) is built in a later phase.
-                        </Dialog.Description>
-                        <Text size="2" color="gray">Coming soon.</Text>
-                        <Flex gap="3" mt="4" justify="end">
-                            <Dialog.Close>
-                                <Button variant="soft" color="gray">Close</Button>
-                            </Dialog.Close>
-                        </Flex>
-                    </Dialog.Content>
-                </Dialog.Root>
+                <NewImportModal
+                    open={newImportOpen}
+                    onOpenChange={setNewImportOpen}
+                    onCreated={handleRunCreated}
+                />
+
+                <ImportResultModal
+                    run={activeRun}
+                    open={resultModalOpen}
+                    onOpenChange={setResultModalOpen}
+                    onConfirmed={handleRunConfirmed}
+                    onRejected={handleRunRejected}
+                />
             </aside>
         </>
     );
