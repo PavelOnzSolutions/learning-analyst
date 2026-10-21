@@ -76,7 +76,7 @@ By default the app does not hard-code delimiter per role — it sniffs the heade
 | Unparseable row (missing required column, structurally broken) | Row excluded from all downstream counts/analysis | ERROR |
 | `povinne_pro` department/position references (`UTVAR:x`, `POZICE:x`) that don't match any value actually present in the Employees file (diacritics/case-insensitive match) | WARNING |
 
-A run with zero ERRORs can be confirmed regardless of WARNING count. A run with one or more ERRORs cannot be confirmed — the user must reject it and re-upload corrected files.
+A run with zero ERRORs can be confirmed regardless of WARNING count. A run with one or more ERRORs can still be confirmed, but the UI requires an explicit second confirmation step acknowledging the errors first (§5, step 3) — the backend does not block confirmation on ERROR findings; it is purely a UI guardrail. Confirming with ERRORs present does not alter or drop any row — every row and field value is persisted exactly as analysis produced it, errors included.
 
 ### 4.3 Mandatory-training compliance
 
@@ -96,8 +96,8 @@ Status buckets: **compliant** (expiry > 60 days out), **expiring soon** (expiry 
 1. **New Import** modal: name/label field + 4 fixed drag/drop upload boxes (role fixed by box position: Completed Trainings, Training Catalog, Training Timeslots, Employees — never inferred from filename).
 2. `POST /api/v1/runs` (multipart, 4 files + name) → backend runs ingestion, sanitization, analysis, and compliance computation, then persists everything immediately as an `import_runs` document with `status = PENDING_REVIEW` plus its associated `run_*` rows. Returns the full analysis result (counts + ERROR/WARNING list).
 3. Frontend shows a second modal with the result: parsed counts, Errors (if any), Warnings, and **Confirm** / **Reject** actions.
-   - If there are ERRORs, Confirm is disabled; user can only Reject.
-4. **Confirm** → `POST /api/v1/runs/{id}/confirm` → status becomes `COMPLETED` → toast notification with a link to `/history/{id}` (the run's detail page).
+   - If there are ERRORs, clicking Confirm first shows a warning dialog ("This run has N error(s). Confirming will import the data as-is, errors included. Are you sure?") requiring an explicit second confirmation before the actual confirm call is made. If there are no ERRORs, Confirm proceeds immediately.
+4. **Confirm** → `POST /api/v1/runs/{id}/confirm` → always succeeds for a `PENDING_REVIEW` run regardless of ERROR findings (the backend does not reject on error count — see §4.2) → status becomes `COMPLETED` → toast notification with a link to `/history/{id}` (the run's detail page).
 5. **Reject** → `DELETE /api/v1/runs/{id}` → the draft run and its `run_*` rows are deleted outright.
 
 ## 6. History & Run Detail
