@@ -52,7 +52,7 @@ public class CsvIngestionService {
             }
 
             List<Finding> findings = new ArrayList<>();
-            if (override != DelimiterSetting.AUTO && headers.size() <= 1 && !headers.isEmpty()) {
+            if (override != DelimiterSetting.AUTO && headers.size() == 1) {
                 findings.add(new Finding(FindingSeverity.WARNING, role, 0, null,
                         "Configured delimiter '" + delimiter + "' produced only one column — the file may use a different delimiter"));
             }

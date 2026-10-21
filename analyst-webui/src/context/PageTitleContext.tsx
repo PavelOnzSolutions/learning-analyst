@@ -15,10 +15,10 @@ export const usePageTitle = (title: string) => {
 
     useEffect(() => {
         context.setTitle(title);
-        document.title = `${title} | Learning Plan`;
+        document.title = `${title} | Learning Analyst`;
         return () => {
             context.setTitle('');
-            document.title = 'Learning Plan Analyst';
+            document.title = 'Learning Analyst';
         };
     }, [title, context]);
 };

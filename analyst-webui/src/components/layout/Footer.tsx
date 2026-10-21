@@ -5,7 +5,7 @@ const Footer = () => {
     const { t } = useTranslation();
     return (
         <footer className="bg-(--footer-glass-bg) backdrop-blur-xl border-t border-(--glass-border) h-16 flex items-center justify-center px-8 text-center text-sm text-(--gray-11) mt-auto z-10 transition-all duration-300">
-            <p>Learning Plan Analyst v{t('lbl_copyright', '{{version}} | © {{year}} Pavel Onz. All rights reserved.', {year: new Date().getFullYear().toString(), version: config.version})}</p>
+            <p>Learning Analyst v{t('lbl_copyright', '{{version}} | © {{year}} Pavel Onz. All rights reserved.', {year: new Date().getFullYear().toString(), version: config.version})}</p>
         </footer>
     );
 };
