@@ -111,13 +111,13 @@ export default function RunDetailPage() {
             />
 
             <Flex direction="row" gap="2" mb="4">
-                <Badge color="indigo">
+                <Badge color="tomato">
                     <Flex direction="row" gap="2">
                         <User2 size={14}/>
                         {run.counts.employees} employees
                     </Flex>
                 </Badge>
-                <Badge color="bronze">
+                <Badge color="iris">
                     <Flex direction="row" gap="2">
                         <GraduationCap size={14}/>
                         {run.counts.trainingCatalogEntries} training catalog entries
