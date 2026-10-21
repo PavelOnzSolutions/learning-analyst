@@ -17,6 +17,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -133,5 +134,31 @@ class RunLifecycleIntegrationTest {
         mockMvc.perform(get("/api/v1/runs").param("status", "COMPLETED").param("sort", "createdAt,desc").with(asUser()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(runId));
+    }
+
+    @Test
+    void detailEndpointReturnsComplianceAndSchedulingDataForACompletedRun() throws Exception {
+        String cleanCompletedCsv =
+                "id_zaznamu;id_zamestnance;zamestnanec;kod_skoleni;datum_absolvovani;platnost_do;poskytovatel;cena_kc;poznamka\n" +
+                "Z0003;E0001;Tereza Urbanova;BOZP-Z;2019-01-06;2099-01-06;Interni;450;\n";
+
+        String createResponse = mockMvc.perform(multipart("/api/v1/runs")
+                        .file(file("employees", EMPLOYEES_CSV))
+                        .file(file("trainingCatalog", CATALOG_CSV))
+                        .file(file("timeslots", TIMESLOTS_CSV))
+                        .file(file("completedTrainings", cleanCompletedCsv))
+                        .param("name", "Integration test run — detail endpoint")
+                        .with(asUser()))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        String runId = JsonPath.read(createResponse, "$.id");
+
+        mockMvc.perform(get("/api/v1/runs/" + runId + "/detail").with(asUser()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.employees", hasSize(1)))
+                .andExpect(jsonPath("$.employees[0].idZamestnance").value("E0001"))
+                .andExpect(jsonPath("$.compliance", hasSize(1)))
+                .andExpect(jsonPath("$.compliance[0].status").value("COMPLIANT"));
     }
 }
