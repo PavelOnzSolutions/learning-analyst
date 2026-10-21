@@ -5,6 +5,7 @@ import ErrorLayout from './layouts/ErrorLayout';
 import LoginForm from './components/layout/LoginForm.tsx';
 import ApiDocs from './pages/admin/ApiDocs.tsx';
 import ApiTokens from './pages/admin/ApiTokens.tsx';
+import Configuration from './pages/admin/Configuration.tsx';
 import UserManagement from './pages/admin/users/UserManagement.tsx';
 import UserProfile from './pages/profile/UserProfile.tsx';
 import InsightsPage from './pages/insights/InsightsPage.tsx';
@@ -49,6 +50,7 @@ function App() {
                 <Route path="/admin/users" element={<UserManagement />} />
                 <Route path="/admin/api-tokens" element={<ApiTokens />} />
                 <Route path="/admin/api-docs" element={<ApiDocs />} />
+                <Route path="/admin/configuration" element={<Configuration />} />
 
                 <Route path="/profile" element={<UserProfile />} />
               </Route>
