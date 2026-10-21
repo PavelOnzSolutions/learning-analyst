@@ -1,6 +1,6 @@
 import {useState} from 'react';
-import {Badge, Button, Card, Flex, Select, Table, Text, Progress} from '@radix-ui/themes';
-import {ArrowLeft, ChevronLeft, ChevronRight, CircleCheck, GraduationCap, History, Timer, User2} from 'lucide-react';
+import {Badge, Card, Flex, Select, Table, Text, Progress} from '@radix-ui/themes';
+import {ArrowLeft, CircleCheck, GraduationCap, History, Timer, User2} from 'lucide-react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import PageHeader from '../../components/layout/PageHeader';
@@ -10,8 +10,8 @@ import type {IRunResponse} from '../../models/run.model';
 import type {ComplianceStatus} from '../../models/run.model';
 import type {IRunDetailResponse} from '../../models/run-detail.model';
 import {useToolbar} from "../../context/ToolbarContext.tsx";
+import PaginationControls from '../../components/system/PaginationControls';
 
-const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
 const DEFAULT_PAGE_SIZE = 10;
 
 const fetchRun = async (id: string): Promise<IRunResponse> => {
@@ -56,6 +56,8 @@ export default function RunDetailPage() {
     const [statusFilter, setStatusFilter] = useState<'ALL' | ComplianceStatus>('ALL');
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+    const [opportunitiesPage, setOpportunitiesPage] = useState(0);
+    const [opportunitiesPageSize, setOpportunitiesPageSize] = useState(DEFAULT_PAGE_SIZE);
 
     useToolbar([
         {id: 'back', label: 'Back', icon: ArrowLeft, onClick: () => navigate(-1)}
@@ -66,9 +68,14 @@ export default function RunDetailPage() {
         setPage(0);
     };
 
-    const handlePageSizeChange = (value: string) => {
-        setPageSize(Number(value));
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
         setPage(0);
+    };
+
+    const handleOpportunitiesPageSizeChange = (size: number) => {
+        setOpportunitiesPageSize(size);
+        setOpportunitiesPage(0);
     };
 
     const {data: run} = useQuery({
@@ -100,6 +107,11 @@ export default function RunDetailPage() {
     );
     const complianceTotalPages = Math.max(1, Math.ceil(filteredCompliance.length / pageSize));
     const pagedCompliance = filteredCompliance.slice(page * pageSize, page * pageSize + pageSize);
+
+    const opportunitiesTotalPages = Math.max(1, Math.ceil(detail.schedulingOpportunities.length / opportunitiesPageSize));
+    const pagedOpportunities = detail.schedulingOpportunities.slice(
+        opportunitiesPage * opportunitiesPageSize, opportunitiesPage * opportunitiesPageSize + opportunitiesPageSize
+    );
 
     return (
         <Card size="4" className="w-full shadow-lg">
@@ -176,34 +188,15 @@ export default function RunDetailPage() {
                 </Table.Body>
             </Table.Root>
 
-            <Flex justify="between" align="center" mt="3" mb="6">
-                <Flex align="center" gap="2">
-                    <Text size="2" color="gray">Rows per page</Text>
-                    <Select.Root value={String(pageSize)} onValueChange={handlePageSizeChange}>
-                        <Select.Trigger/>
-                        <Select.Content>
-                            {PAGE_SIZE_OPTIONS.map((size) => (
-                                <Select.Item key={size} value={String(size)}>{size}</Select.Item>
-                            ))}
-                        </Select.Content>
-                    </Select.Root>
-                </Flex>
+            <PaginationControls
+                page={page}
+                totalPages={complianceTotalPages}
+                pageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={handlePageSizeChange}
+            />
 
-                {complianceTotalPages > 1 && (
-                    <Flex align="center" gap="3">
-                        <Button variant="soft" color="gray" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-                            <ChevronLeft className="w-4 h-4"/> Previous
-                        </Button>
-                        <Text size="2" color="gray">Page {page + 1} of {complianceTotalPages}</Text>
-                        <Button variant="soft" color="gray" disabled={page >= complianceTotalPages - 1}
-                                onClick={() => setPage((p) => p + 1)}>
-                            Next <ChevronRight className="w-4 h-4"/>
-                        </Button>
-                    </Flex>
-                )}
-            </Flex>
-
-            <Text size="4" weight="bold" mb="2">Scheduling Opportunities</Text>
+            <Text size="4" weight="bold" mb="2" mt="6">Scheduling Opportunities</Text>
             <Table.Root variant="surface">
                 <Table.Header>
                     <Table.Row>
@@ -215,7 +208,7 @@ export default function RunDetailPage() {
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                    {detail.schedulingOpportunities.map((opportunity, index) => (
+                    {pagedOpportunities.map((opportunity, index) => (
                         <Table.Row key={index}>
                             <Table.Cell>{opportunity.employeeName}</Table.Cell>
                             <Table.Cell>{opportunity.kodSkoleni}</Table.Cell>
@@ -227,6 +220,14 @@ export default function RunDetailPage() {
                     ))}
                 </Table.Body>
             </Table.Root>
+
+            <PaginationControls
+                page={opportunitiesPage}
+                totalPages={opportunitiesTotalPages}
+                pageSize={opportunitiesPageSize}
+                onPageChange={setOpportunitiesPage}
+                onPageSizeChange={handleOpportunitiesPageSizeChange}
+            />
         </Card>
     );
 }

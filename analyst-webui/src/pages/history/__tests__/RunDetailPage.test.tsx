@@ -2,22 +2,30 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Theme } from '@radix-ui/themes';
+import { Theme, Button } from '@radix-ui/themes';
 import { PageTitleProvider } from '../../../context/PageTitleContext';
+import { ToolbarProvider, useToolbarState } from '../../../context/ToolbarContext';
 import RunDetailPage from '../RunDetailPage';
 import config from '../../../config';
 
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
-// jsdom does not implement scrollIntoView, which Radix UI's Select calls when
-// highlighting the selected item on open/select.
-if (!Element.prototype.scrollIntoView) {
-    Element.prototype.scrollIntoView = vi.fn();
-}
-
 function okJson(data: unknown) {
     return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(data) } as Response);
+}
+
+function TestToolbarRenderer() {
+    const { actions } = useToolbarState();
+    return (
+        <div>
+            {actions.map((action) => (
+                <Button key={action.id} onClick={action.onClick}>
+                    {action.label}
+                </Button>
+            ))}
+        </div>
+    );
 }
 
 function renderPage() {
@@ -26,11 +34,13 @@ function renderPage() {
         <QueryClientProvider client={queryClient}>
             <Theme>
                 <PageTitleProvider>
-                    <MemoryRouter initialEntries={['/history/r1']}>
-                        <Routes>
-                            <Route path="/history/:id" element={<RunDetailPage />} />
-                        </Routes>
-                    </MemoryRouter>
+                    <ToolbarProvider>
+                        <MemoryRouter initialEntries={['/history/r1']}>
+                            <Routes>
+                                <Route path="/history/:id" element={<><TestToolbarRenderer /><RunDetailPage /></>} />
+                            </Routes>
+                        </MemoryRouter>
+                    </ToolbarProvider>
                 </PageTitleProvider>
             </Theme>
         </QueryClientProvider>
@@ -43,12 +53,14 @@ function renderPageWithHistoryBehind() {
         <QueryClientProvider client={queryClient}>
             <Theme>
                 <PageTitleProvider>
-                    <MemoryRouter initialEntries={['/history', '/history/r1']} initialIndex={1}>
-                        <Routes>
-                            <Route path="/history" element={<div>History List Placeholder</div>} />
-                            <Route path="/history/:id" element={<RunDetailPage />} />
-                        </Routes>
-                    </MemoryRouter>
+                    <ToolbarProvider>
+                        <MemoryRouter initialEntries={['/history', '/history/r1']} initialIndex={1}>
+                            <Routes>
+                                <Route path="/history" element={<div>History List Placeholder</div>} />
+                                <Route path="/history/:id" element={<><TestToolbarRenderer /><RunDetailPage /></>} />
+                            </Routes>
+                        </MemoryRouter>
+                    </ToolbarProvider>
                 </PageTitleProvider>
             </Theme>
         </QueryClientProvider>
@@ -118,7 +130,7 @@ describe('RunDetailPage', () => {
         expect(screen.queryByText('Jan Novák')).not.toBeInTheDocument();
     });
 
-    it('navigates back to the previous page when Back is clicked', async () => {
+    it('navigates back to the previous page when the toolbar Back action is clicked', async () => {
         renderPageWithHistoryBehind();
 
         await waitFor(() => expect(screen.getByText('October import')).toBeInTheDocument());
@@ -150,13 +162,40 @@ describe('RunDetailPage', () => {
         await waitFor(() => expect(screen.getByText('Employee 0')).toBeInTheDocument());
         expect(screen.getByText('Employee 9')).toBeInTheDocument();
         expect(screen.queryByText('Employee 10')).not.toBeInTheDocument();
-        expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
 
-        fireEvent.click(screen.getByText('Next'));
+        const nextButtons = screen.getAllByText('Next');
+        fireEvent.click(nextButtons[0]);
 
         await waitFor(() => expect(screen.getByText('Employee 10')).toBeInTheDocument());
         expect(screen.getByText('Employee 11')).toBeInTheDocument();
         expect(screen.queryByText('Employee 0')).not.toBeInTheDocument();
-        expect(screen.getByText('Page 2 of 2')).toBeInTheDocument();
+    });
+
+    it('paginates the scheduling-opportunities table independently of the mandatory-training table', async () => {
+        const manyOpportunities = Array.from({ length: 11 }, (_, i) => ({
+            idZamestnance: `E${i}`, employeeName: `Opportunity ${i}`, kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Základní školení',
+            status: 'OVERDUE' as const, idTerminu: `T${i}`, datum: '2026-11-01', kapacita: 10, obsazeno: 5,
+        }));
+        mockFetch.mockReset();
+        mockFetch.mockImplementation((url: string) => {
+            if (url === `${config.apiBaseUrl}/v1/runs/r1`) {
+                return okJson(run);
+            }
+            if (url === `${config.apiBaseUrl}/v1/runs/r1/detail`) {
+                return okJson({ ...detail, compliance: [], schedulingOpportunities: manyOpportunities });
+            }
+            throw new Error(`Unexpected fetch to ${url}`);
+        });
+
+        renderPage();
+
+        await waitFor(() => expect(screen.getByText('Opportunity 0')).toBeInTheDocument());
+        expect(screen.getByText('Opportunity 9')).toBeInTheDocument();
+        expect(screen.queryByText('Opportunity 10')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Next'));
+
+        await waitFor(() => expect(screen.getByText('Opportunity 10')).toBeInTheDocument());
+        expect(screen.queryByText('Opportunity 0')).not.toBeInTheDocument();
     });
 });
