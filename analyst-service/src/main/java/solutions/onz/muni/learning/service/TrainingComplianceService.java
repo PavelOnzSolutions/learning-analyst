@@ -8,6 +8,7 @@ import solutions.onz.muni.learning.domain.RunTrainingCatalogEntry;
 import solutions.onz.muni.learning.service.analysis.PovinneProRule;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -19,9 +20,16 @@ public class TrainingComplianceService {
 
     public ComplianceSummary summarize(List<RunEmployee> employees, List<RunTrainingCatalogEntry> catalog,
                                         List<RunCompletedTraining> completedTrainings, LocalDate asOf) {
-        long compliant = 0;
-        long expiring = 0;
-        long overdue = 0;
+        List<ComplianceRecord> records = computeDetail(employees, catalog, completedTrainings, asOf);
+        long compliant = records.stream().filter(r -> r.status() == ComplianceStatus.COMPLIANT).count();
+        long expiring = records.stream().filter(r -> r.status() == ComplianceStatus.EXPIRING_SOON).count();
+        long overdue = records.stream().filter(r -> r.status() == ComplianceStatus.OVERDUE).count();
+        return new ComplianceSummary(compliant, expiring, overdue);
+    }
+
+    public List<ComplianceRecord> computeDetail(List<RunEmployee> employees, List<RunTrainingCatalogEntry> catalog,
+                                                 List<RunCompletedTraining> completedTrainings, LocalDate asOf) {
+        List<ComplianceRecord> records = new ArrayList<>();
 
         for (RunEmployee employee : employees) {
             if (isTerminated(employee)) {
@@ -35,25 +43,20 @@ public class TrainingComplianceService {
                 if (!rule.matches(employee.getUtvar(), employee.getPozice())) {
                     continue;
                 }
-                switch (classify(employee, entry, completedTrainings, asOf)) {
-                    case COMPLIANT -> compliant++;
-                    case EXPIRING_SOON -> expiring++;
-                    case OVERDUE -> overdue++;
-                }
+                ComplianceStatus status = classify(employee, entry, completedTrainings, asOf);
+                LocalDate expiryDate = resolveExpiryForDisplay(employee, entry, completedTrainings);
+                records.add(new ComplianceRecord(
+                        employee.getIdZamestnance(), formatName(employee), employee.getUtvar(), employee.getPozice(),
+                        entry.getKod(), entry.getNazev(), status, expiryDate));
             }
         }
 
-        return new ComplianceSummary(compliant, expiring, overdue);
+        return records;
     }
 
     ComplianceStatus classify(RunEmployee employee, RunTrainingCatalogEntry entry,
                                List<RunCompletedTraining> completedTrainings, LocalDate asOf) {
-        RunCompletedTraining mostRecent = completedTrainings.stream()
-                .filter(t -> employee.getIdZamestnance().equals(t.getIdZamestnance())
-                        && entry.getKod().equalsIgnoreCase(t.getKodSkoleni()))
-                .max(Comparator.comparing(RunCompletedTraining::getDatumAbsolvovani,
-                        Comparator.nullsFirst(Comparator.naturalOrder())))
-                .orElse(null);
+        RunCompletedTraining mostRecent = findMostRecentCompletion(employee, entry, completedTrainings);
 
         if (mostRecent == null) {
             return ComplianceStatus.OVERDUE;
@@ -77,6 +80,40 @@ public class TrainingComplianceService {
             return ComplianceStatus.EXPIRING_SOON;
         }
         return ComplianceStatus.COMPLIANT;
+    }
+
+    private LocalDate resolveExpiryForDisplay(RunEmployee employee, RunTrainingCatalogEntry entry,
+                                               List<RunCompletedTraining> completedTrainings) {
+        RunCompletedTraining mostRecent = findMostRecentCompletion(employee, entry, completedTrainings);
+        if (mostRecent == null) {
+            return null;
+        }
+        if (mostRecent.getPlatnostDo() != null) {
+            return mostRecent.getPlatnostDo();
+        }
+        if (entry.getPlatnostMesicu() == null || entry.getPlatnostMesicu() == 0) {
+            return null;
+        }
+        if (mostRecent.getDatumAbsolvovani() != null) {
+            return mostRecent.getDatumAbsolvovani().plusMonths(entry.getPlatnostMesicu());
+        }
+        return null;
+    }
+
+    private RunCompletedTraining findMostRecentCompletion(RunEmployee employee, RunTrainingCatalogEntry entry,
+                                                            List<RunCompletedTraining> completedTrainings) {
+        return completedTrainings.stream()
+                .filter(t -> employee.getIdZamestnance().equals(t.getIdZamestnance())
+                        && entry.getKod().equalsIgnoreCase(t.getKodSkoleni()))
+                .max(Comparator.comparing(RunCompletedTraining::getDatumAbsolvovani,
+                        Comparator.nullsFirst(Comparator.naturalOrder())))
+                .orElse(null);
+    }
+
+    private String formatName(RunEmployee employee) {
+        String jmeno = employee.getJmeno() != null ? employee.getJmeno() : "";
+        String prijmeni = employee.getPrijmeni() != null ? employee.getPrijmeni() : "";
+        return (jmeno + " " + prijmeni).trim();
     }
 
     private boolean isTerminated(RunEmployee employee) {
