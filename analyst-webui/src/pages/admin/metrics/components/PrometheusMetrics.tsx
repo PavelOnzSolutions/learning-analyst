@@ -4,7 +4,7 @@ import {useTranslation} from "react-i18next";
 import React, {Fragment} from "react";
 import {formatDoublePrecisionWithSuffix, lowerKebabCaseToLabel} from "../../../../utils/utils.ts";
 import {AccentColor, accentColors} from "../../../../context/ThemeContext.tsx";
-import MiniChart from "../../../../components/graphs/MiniChart.tsx";
+import MiniChart from "../../../../components/charts/MiniChart.tsx";
 
 const getCategoryColor = (name: string) => {
     const category = name.split('_')[0];
