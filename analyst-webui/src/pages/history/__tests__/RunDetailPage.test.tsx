@@ -37,6 +37,24 @@ function renderPage() {
     );
 }
 
+function renderPageWithHistoryBehind() {
+    const queryClient = new QueryClient();
+    return render(
+        <QueryClientProvider client={queryClient}>
+            <Theme>
+                <PageTitleProvider>
+                    <MemoryRouter initialEntries={['/history', '/history/r1']} initialIndex={1}>
+                        <Routes>
+                            <Route path="/history" element={<div>History List Placeholder</div>} />
+                            <Route path="/history/:id" element={<RunDetailPage />} />
+                        </Routes>
+                    </MemoryRouter>
+                </PageTitleProvider>
+            </Theme>
+        </QueryClientProvider>
+    );
+}
+
 const run = {
     id: 'r1', name: 'October import', status: 'COMPLETED', createdAt: '2026-10-01T00:00:00Z',
     confirmedAt: '2026-10-01T01:00:00Z', createdBy: 'u1',
@@ -98,5 +116,47 @@ describe('RunDetailPage', () => {
         // (unfiltered) scheduling-opportunities table.
         expect(screen.getAllByText('Tereza Urbanová').length).toBeGreaterThan(0);
         expect(screen.queryByText('Jan Novák')).not.toBeInTheDocument();
+    });
+
+    it('navigates back to the previous page when Back is clicked', async () => {
+        renderPageWithHistoryBehind();
+
+        await waitFor(() => expect(screen.getByText('October import')).toBeInTheDocument());
+
+        fireEvent.click(screen.getByText('Back'));
+
+        await waitFor(() => expect(screen.getByText('History List Placeholder')).toBeInTheDocument());
+    });
+
+    it('paginates the mandatory-training table independently of the status filter', async () => {
+        const manyRecords = Array.from({ length: 12 }, (_, i) => ({
+            idZamestnance: `E${i}`, employeeName: `Employee ${i}`, utvar: 'Lab', pozice: 'Tech',
+            kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Základní školení',
+            status: 'OVERDUE' as const, expiryDate: null,
+        }));
+        mockFetch.mockReset();
+        mockFetch.mockImplementation((url: string) => {
+            if (url === `${config.apiBaseUrl}/v1/runs/r1`) {
+                return okJson(run);
+            }
+            if (url === `${config.apiBaseUrl}/v1/runs/r1/detail`) {
+                return okJson({ ...detail, compliance: manyRecords });
+            }
+            throw new Error(`Unexpected fetch to ${url}`);
+        });
+
+        renderPage();
+
+        await waitFor(() => expect(screen.getByText('Employee 0')).toBeInTheDocument());
+        expect(screen.getByText('Employee 9')).toBeInTheDocument();
+        expect(screen.queryByText('Employee 10')).not.toBeInTheDocument();
+        expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Next'));
+
+        await waitFor(() => expect(screen.getByText('Employee 10')).toBeInTheDocument());
+        expect(screen.getByText('Employee 11')).toBeInTheDocument();
+        expect(screen.queryByText('Employee 0')).not.toBeInTheDocument();
+        expect(screen.getByText('Page 2 of 2')).toBeInTheDocument();
     });
 });

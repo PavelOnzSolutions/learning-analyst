@@ -43,3 +43,4 @@ out/
 
 /docs/superpowers/plans
 /sample-data
+*.log

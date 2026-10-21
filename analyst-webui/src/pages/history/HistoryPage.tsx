@@ -1,5 +1,5 @@
-import { Card, Table, Text, Progress, Flex, Button, Select } from '@radix-ui/themes';
-import {History, RefreshCw, ChevronLeft, ChevronRight} from 'lucide-react';
+import { Card, Table, Text, Progress } from '@radix-ui/themes';
+import {History, RefreshCw} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -8,8 +8,8 @@ import { usePageTitle } from '../../context/PageTitleContext';
 import { fetchWithAuth } from '../../utils/api';
 import type { IRunResponse } from '../../models/run.model';
 import {useToolbar} from "../../context/ToolbarContext.tsx";
+import PaginationControls from '../../components/system/PaginationControls';
 
-const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
 const DEFAULT_PAGE_SIZE = 20;
 
 interface RunPage {
@@ -38,8 +38,8 @@ const HistoryPage = () => {
         queryFn: () => fetchCompletedRuns(page, pageSize),
     });
 
-    const handlePageSizeChange = (value: string) => {
-        setPageSize(Number(value));
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
         setPage(0);
     };
 
@@ -95,31 +95,13 @@ const HistoryPage = () => {
                         </Table.Body>
                     </Table.Root>
 
-                    <Flex justify="between" align="center" mt="4">
-                        <Flex align="center" gap="2">
-                            <Text size="2" color="gray">Rows per page</Text>
-                            <Select.Root value={String(pageSize)} onValueChange={handlePageSizeChange}>
-                                <Select.Trigger />
-                                <Select.Content>
-                                    {PAGE_SIZE_OPTIONS.map((size) => (
-                                        <Select.Item key={size} value={String(size)}>{size}</Select.Item>
-                                    ))}
-                                </Select.Content>
-                            </Select.Root>
-                        </Flex>
-
-                        {totalPages > 1 && (
-                            <Flex align="center" gap="3">
-                                <Button variant="soft" color="gray" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-                                    <ChevronLeft className="w-4 h-4" /> Previous
-                                </Button>
-                                <Text size="2" color="gray">Page {page + 1} of {totalPages}</Text>
-                                <Button variant="soft" color="gray" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>
-                                    Next <ChevronRight className="w-4 h-4" />
-                                </Button>
-                            </Flex>
-                        )}
-                    </Flex>
+                    <PaginationControls
+                        page={page}
+                        totalPages={totalPages}
+                        pageSize={pageSize}
+                        onPageChange={setPage}
+                        onPageSizeChange={handlePageSizeChange}
+                    />
                 </>
             )}
         </Card>
