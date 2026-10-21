@@ -64,13 +64,13 @@ class RunLifecycleIntegrationTest {
     }
 
     @Test
-    void runWithAnUnresolvableReferenceCannotBeConfirmedButCanBeRejected() throws Exception {
+    void runWithUnresolvedErrorsCanStillBeConfirmed() throws Exception {
         String createResponse = mockMvc.perform(multipart("/api/v1/runs")
                         .file(file("employees", EMPLOYEES_CSV))
                         .file(file("trainingCatalog", CATALOG_CSV))
                         .file(file("timeslots", TIMESLOTS_CSV))
                         .file(file("completedTrainings", COMPLETED_CSV_WITH_UNRESOLVABLE_EMPLOYEE))
-                        .param("name", "Integration test run — has error")
+                        .param("name", "Integration test run — has error, confirmed anyway")
                         .with(asUser()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDING_REVIEW"))
@@ -80,7 +80,25 @@ class RunLifecycleIntegrationTest {
         String runId = JsonPath.read(createResponse, "$.id");
 
         mockMvc.perform(post("/api/v1/runs/" + runId + "/confirm").with(asUser()))
-                .andExpect(status().isConflict());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("COMPLETED"))
+                .andExpect(jsonPath("$.counts.errorCount").value(1));
+    }
+
+    @Test
+    void pendingReviewRunCanBeRejectedRegardlessOfErrors() throws Exception {
+        String createResponse = mockMvc.perform(multipart("/api/v1/runs")
+                        .file(file("employees", EMPLOYEES_CSV))
+                        .file(file("trainingCatalog", CATALOG_CSV))
+                        .file(file("timeslots", TIMESLOTS_CSV))
+                        .file(file("completedTrainings", COMPLETED_CSV_WITH_UNRESOLVABLE_EMPLOYEE))
+                        .param("name", "Integration test run — has error, rejected")
+                        .with(asUser()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.counts.errorCount").value(1))
+                .andReturn().getResponse().getContentAsString();
+
+        String runId = JsonPath.read(createResponse, "$.id");
 
         mockMvc.perform(delete("/api/v1/runs/" + runId).with(asUser()))
                 .andExpect(status().isNoContent());

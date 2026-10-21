@@ -149,10 +149,6 @@ public class RunService {
         if (run.getStatus() != RunStatus.PENDING_REVIEW) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Run is not pending review");
         }
-        boolean hasErrors = run.getFindings().stream().anyMatch(f -> f.severity() == FindingSeverity.ERROR);
-        if (hasErrors) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Run has unresolved errors and cannot be confirmed");
-        }
         run.setStatus(RunStatus.COMPLETED);
         run.setConfirmedAt(Instant.now());
         return importRunRepository.save(run);

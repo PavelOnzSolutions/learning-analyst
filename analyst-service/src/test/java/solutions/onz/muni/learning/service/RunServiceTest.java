@@ -125,14 +125,17 @@ class RunServiceTest {
     }
 
     @Test
-    void confirmRunThrowsConflictWhenErrorFindingsExist() {
+    void confirmRunSucceedsEvenWithUnresolvedErrorFindings() {
         ImportRun run = new ImportRun();
         run.setId("r1");
         run.setStatus(RunStatus.PENDING_REVIEW);
         run.setFindings(List.of(new Finding(FindingSeverity.ERROR, FileRole.EMPLOYEES, 1, "id_zamestnance", "Missing")));
         when(importRunRepository.findById("r1")).thenReturn(Optional.of(run));
 
-        assertThatThrownBy(() -> runService.confirmRun("r1")).isInstanceOf(ResponseStatusException.class);
+        ImportRun confirmed = runService.confirmRun("r1");
+
+        assertThat(confirmed.getStatus()).isEqualTo(RunStatus.COMPLETED);
+        assertThat(confirmed.getConfirmedAt()).isNotNull();
     }
 
     @Test
