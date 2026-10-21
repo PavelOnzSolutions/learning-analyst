@@ -215,7 +215,7 @@ export default function RunDetailPage() {
                     </Select.Content>
                 </Select.Root>
             </Flex>
-
+            <Flex direction="column" gap="4">
             <Table.Root variant="surface">
                 <Table.Header>
                     <Table.Row>
@@ -282,6 +282,7 @@ export default function RunDetailPage() {
                 onPageChange={setOpportunitiesPage}
                 onPageSizeChange={handleOpportunitiesPageSizeChange}
             />
+            </Flex>
         </Card>
     );
 }
