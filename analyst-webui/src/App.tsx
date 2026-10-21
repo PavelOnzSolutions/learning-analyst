@@ -47,6 +47,7 @@ function App() {
                 <Route path="/" element={<Navigate to="/insights" replace />} />
                 <Route path="/insights" element={<InsightsPage />} />
                 <Route path="/history" element={<HistoryPage />} />
+                <Route path="/history/:id" element={<div>Run detail coming in a later task</div>} />
 
                 <Route path="/admin/users" element={<UserManagement />} />
                 <Route path="/admin/api-tokens" element={<ApiTokens />} />
