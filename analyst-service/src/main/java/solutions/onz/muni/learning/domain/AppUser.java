@@ -30,5 +30,9 @@ public class AppUser {
     private String passwordHash;
     private Role role;
     private boolean enabled;
+    // @Indexed: UserManagement.tsx sorts the user list by createdAt (sort=createdAt,desc).
+    // Azure Cosmos DB for MongoDB (RU API) rejects an order-by on a path its indexing
+    // policy doesn't cover, so the sort field needs an explicit index (see ImportRun.createdAt).
+    @Indexed
     private Instant createdAt;
 }
