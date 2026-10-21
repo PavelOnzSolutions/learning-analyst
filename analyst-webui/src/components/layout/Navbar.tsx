@@ -22,7 +22,7 @@ interface NavbarProps {
     toggleSidebar: () => void;
 }
 
-const BACKGROUND_OPTIONS: BackgroundType[] = ['orbs', 'starfield'];
+const BACKGROUND_OPTIONS: BackgroundType[] = ['orbs', 'starfield', 'particles', 'glyphs'];
 
 const Navbar: React.FC<NavbarProps> = ({toggleSidebar}) => {
     const {
