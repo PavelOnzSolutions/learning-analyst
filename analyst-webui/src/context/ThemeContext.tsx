@@ -87,7 +87,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     });
 
     const [backgroundType, setBackgroundType] = useState<BackgroundType>(() => {
-        return (localStorage.getItem('backgroundType') as BackgroundType) || 'orbs';
+        return (localStorage.getItem('backgroundType') as BackgroundType) || 'glyphs';
     });
 
     const [radiusType, setRadiusType] = useState<ElementEdgeRadius>(() => {
