@@ -90,7 +90,7 @@ export default function OrgHeadcountChart({ employees }: OrgHeadcountChartProps)
     const byPosition = countBy(employees, 'pozice');
 
     return (
-        <Flex gap="4" justify="center">
+        <Flex gap="4" justify="center" wrap="wrap">
             <BarGroup title="Headcount by Department" data={byDepartment} color="var(--accent-9)"/>
             <BarGroup title="Headcount by Position" data={byPosition} color="var(--cyan-9)"/>
         </Flex>

@@ -55,7 +55,7 @@ export default function ComplianceByDepartmentChart({ records }: ComplianceByDep
 
     return (
         <Flex direction="column" gap="3">
-            <svg width="100%" style={{ maxWidth: WIDTH }} viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label="Compliance by department">
+            <svg width="100%" viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label="Compliance by department">
                 <g transform={`translate(${marginLeft},${MARGIN_TOP})`}>
                     {ticks.map((tick) => (
                         <g key={tick}>
