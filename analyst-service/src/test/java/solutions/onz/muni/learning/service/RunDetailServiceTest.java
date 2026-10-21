@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import solutions.onz.muni.learning.api.dto.RunDetailResponse;
 import solutions.onz.muni.learning.api.dto.SchedulingOpportunity;
-import solutions.onz.muni.learning.domain.ComplianceStatus;
+import solutions.onz.muni.learning.domain.enums.ComplianceStatus;
 import solutions.onz.muni.learning.domain.ImportRun;
 import solutions.onz.muni.learning.domain.RunCompletedTraining;
 import solutions.onz.muni.learning.domain.RunEmployee;

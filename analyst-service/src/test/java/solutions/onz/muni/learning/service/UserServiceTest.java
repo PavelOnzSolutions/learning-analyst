@@ -13,7 +13,7 @@ import solutions.onz.muni.learning.api.dto.UserDtos.CreateUserRequest;
 import solutions.onz.muni.learning.api.dto.UserDtos.UpdateProfileRequest;
 import solutions.onz.muni.learning.api.dto.UserDtos.UpdateUserRequest;
 import solutions.onz.muni.learning.domain.AppUser;
-import solutions.onz.muni.learning.domain.Role;
+import solutions.onz.muni.learning.domain.enums.Role;
 import solutions.onz.muni.learning.repository.AppUserRepository;
 
 import java.time.Instant;

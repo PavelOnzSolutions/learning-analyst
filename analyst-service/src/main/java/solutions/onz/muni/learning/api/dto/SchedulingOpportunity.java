@@ -1,6 +1,6 @@
 package solutions.onz.muni.learning.api.dto;
 
-import solutions.onz.muni.learning.domain.ComplianceStatus;
+import solutions.onz.muni.learning.domain.enums.ComplianceStatus;
 
 import java.time.LocalDate;
 

@@ -10,6 +10,7 @@ import UserManagement from './pages/admin/users/UserManagement.tsx';
 import UserProfile from './pages/profile/UserProfile.tsx';
 import InsightsPage from './pages/insights/InsightsPage.tsx';
 import HistoryPage from './pages/history/HistoryPage.tsx';
+import RunDetailPage from './pages/history/RunDetailPage.tsx';
 import Error404 from './pages/error/Error404';
 import Error403 from './pages/error/Error403';
 import Error401 from './pages/error/Error401';
@@ -47,7 +48,7 @@ function App() {
                 <Route path="/" element={<Navigate to="/insights" replace />} />
                 <Route path="/insights" element={<InsightsPage />} />
                 <Route path="/history" element={<HistoryPage />} />
-                <Route path="/history/:id" element={<div>Run detail coming in a later task</div>} />
+                <Route path="/history/:id" element={<RunDetailPage />} />
 
                 <Route path="/admin/users" element={<UserManagement />} />
                 <Route path="/admin/api-tokens" element={<ApiTokens />} />

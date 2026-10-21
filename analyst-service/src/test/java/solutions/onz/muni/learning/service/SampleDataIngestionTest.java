@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-import solutions.onz.muni.learning.domain.FileRole;
+import solutions.onz.muni.learning.domain.enums.FileRole;
 import solutions.onz.muni.learning.domain.ImportRun;
 import solutions.onz.muni.learning.domain.ImportSettings;
 import solutions.onz.muni.learning.repository.ImportRunRepository;

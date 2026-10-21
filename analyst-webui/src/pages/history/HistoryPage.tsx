@@ -1,11 +1,12 @@
-import { Card, Table, Text } from '@radix-ui/themes';
-import { History } from 'lucide-react';
+import { Card, Table, Text, Progress } from '@radix-ui/themes';
+import {History, RefreshCw} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '../../components/layout/PageHeader';
 import { usePageTitle } from '../../context/PageTitleContext';
 import { fetchWithAuth } from '../../utils/api';
 import type { IRunResponse } from '../../models/run.model';
+import {useToolbar} from "../../context/ToolbarContext.tsx";
 
 interface RunPage {
     content: IRunResponse[];
@@ -24,16 +25,26 @@ const HistoryPage = () => {
     usePageTitle('History');
     const navigate = useNavigate();
 
-    const { data } = useQuery({
+    const { data, isLoading, refetch } = useQuery({
         queryKey: ['runs', 'COMPLETED'],
         queryFn: fetchCompletedRuns,
     });
+
+    useToolbar([
+        { id: 'refresh', label: 'Refresh', icon: RefreshCw, onClick: () => refetch(), isLoading: isLoading },
+    ]);
 
     const runs = data?.content ?? [];
 
     return (
         <Card size="4" className="w-full shadow-lg">
             <PageHeader icon={History} title="History" description="All completed import runs and their analysis results" />
+
+            {isLoading && (
+                <div className="mb-4">
+                    <Progress />
+                </div>
+            )}
 
             {runs.length === 0 ? (
                 <Text size="2" color="gray">No completed import runs yet. Use New Import from the sidebar to get started.</Text>

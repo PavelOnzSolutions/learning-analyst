@@ -4,7 +4,7 @@ import com.nimbusds.jwt.SignedJWT;
 import org.junit.jupiter.api.Test;
 import solutions.onz.muni.learning.config.ApplicationProperties;
 import solutions.onz.muni.learning.domain.AppUser;
-import solutions.onz.muni.learning.domain.Role;
+import solutions.onz.muni.learning.domain.enums.Role;
 
 import java.time.Instant;
 

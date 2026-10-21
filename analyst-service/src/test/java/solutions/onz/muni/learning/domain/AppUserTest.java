@@ -1,6 +1,8 @@
 package solutions.onz.muni.learning.domain;
 
 import org.junit.jupiter.api.Test;
+import solutions.onz.muni.learning.domain.enums.Role;
+
 import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -4,10 +4,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
-import solutions.onz.muni.learning.domain.DelimiterSetting;
-import solutions.onz.muni.learning.domain.FileRole;
+import solutions.onz.muni.learning.domain.enums.DelimiterSetting;
+import solutions.onz.muni.learning.domain.enums.FileRole;
 import solutions.onz.muni.learning.domain.Finding;
-import solutions.onz.muni.learning.domain.FindingSeverity;
+import solutions.onz.muni.learning.domain.enums.FindingSeverity;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

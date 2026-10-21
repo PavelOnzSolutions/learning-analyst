@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import solutions.onz.muni.learning.api.dto.RunDetailResponse;
 import solutions.onz.muni.learning.api.dto.RunResponse;
 import solutions.onz.muni.learning.domain.ImportRun;
-import solutions.onz.muni.learning.domain.RunStatus;
+import solutions.onz.muni.learning.domain.enums.RunStatus;
 import solutions.onz.muni.learning.service.RunDetailService;
 import solutions.onz.muni.learning.service.RunService;
 

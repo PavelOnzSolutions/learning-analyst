@@ -1,6 +1,9 @@
 package solutions.onz.muni.learning.domain;
 
 import org.junit.jupiter.api.Test;
+import solutions.onz.muni.learning.domain.enums.FileRole;
+import solutions.onz.muni.learning.domain.enums.FindingSeverity;
+import solutions.onz.muni.learning.domain.enums.RunStatus;
 
 import java.time.Instant;
 import java.util.List;
