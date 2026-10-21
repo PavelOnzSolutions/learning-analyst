@@ -2,8 +2,8 @@ package solutions.onz.muni.learning.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import solutions.onz.muni.learning.domain.DelimiterSetting;
-import solutions.onz.muni.learning.domain.FileRole;
+import solutions.onz.muni.learning.domain.enums.DelimiterSetting;
+import solutions.onz.muni.learning.domain.enums.FileRole;
 import solutions.onz.muni.learning.domain.ImportSettings;
 import solutions.onz.muni.learning.repository.ImportSettingsRepository;
 

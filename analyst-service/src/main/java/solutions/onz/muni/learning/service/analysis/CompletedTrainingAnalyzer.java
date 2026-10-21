@@ -3,8 +3,8 @@ package solutions.onz.muni.learning.service.analysis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import solutions.onz.muni.learning.domain.Finding;
-import solutions.onz.muni.learning.domain.FindingSeverity;
-import solutions.onz.muni.learning.domain.FileRole;
+import solutions.onz.muni.learning.domain.enums.FindingSeverity;
+import solutions.onz.muni.learning.domain.enums.FileRole;
 import solutions.onz.muni.learning.domain.RunCompletedTraining;
 import solutions.onz.muni.learning.service.csv.SanitizationService;
 

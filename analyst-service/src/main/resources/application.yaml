@@ -27,6 +27,56 @@ springdoc:
     syntax-highlight:
       activated: true
 
+management:
+  info:
+    process:
+      enabled: true
+    git:
+      mode: full
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  health:
+    mongo:
+      enabled: true
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+      roles: "PERM_HEALTH_READ,PERM_HEALTH_WRITE"
+    metrics:
+      access: read_only
+    info:
+      access: read_only
+    prometheus:
+      access: read_only
+    logfile:
+      access: read_only
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - caches
+          - strato-metrics
+          - prometheus
+          - logfile
+      base-path: /api/management
+
+logging:
+  file:
+    name: "./la.log"
+
 analyst:
   jwt:
     issuer: learning-analyst

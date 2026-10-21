@@ -3,7 +3,7 @@ package solutions.onz.muni.learning.api.dto;
 import solutions.onz.muni.learning.domain.Counts;
 import solutions.onz.muni.learning.domain.Finding;
 import solutions.onz.muni.learning.domain.ImportRun;
-import solutions.onz.muni.learning.domain.RunStatus;
+import solutions.onz.muni.learning.domain.enums.RunStatus;
 
 import java.time.Instant;
 import java.util.List;

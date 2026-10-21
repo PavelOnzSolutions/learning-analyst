@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import solutions.onz.muni.learning.domain.enums.Role;
 
 import java.time.Instant;
 

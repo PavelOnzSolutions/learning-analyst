@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import solutions.onz.muni.learning.domain.ApiToken;
 import solutions.onz.muni.learning.domain.AppUser;
-import solutions.onz.muni.learning.domain.Role;
+import solutions.onz.muni.learning.domain.enums.Role;
 import solutions.onz.muni.learning.repository.AppUserRepository;
 import solutions.onz.muni.learning.repository.ApiTokenRepository;
 

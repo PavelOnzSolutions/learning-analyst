@@ -1,9 +1,9 @@
 package solutions.onz.muni.learning.service.csv;
 
 import org.junit.jupiter.api.Test;
-import solutions.onz.muni.learning.domain.DelimiterSetting;
-import solutions.onz.muni.learning.domain.FileRole;
-import solutions.onz.muni.learning.domain.FindingSeverity;
+import solutions.onz.muni.learning.domain.enums.DelimiterSetting;
+import solutions.onz.muni.learning.domain.enums.FileRole;
+import solutions.onz.muni.learning.domain.enums.FindingSeverity;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

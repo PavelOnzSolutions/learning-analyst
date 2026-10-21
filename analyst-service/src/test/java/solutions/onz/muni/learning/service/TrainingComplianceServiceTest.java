@@ -1,7 +1,7 @@
 package solutions.onz.muni.learning.service;
 
 import org.junit.jupiter.api.Test;
-import solutions.onz.muni.learning.domain.ComplianceStatus;
+import solutions.onz.muni.learning.domain.enums.ComplianceStatus;
 import solutions.onz.muni.learning.domain.RunCompletedTraining;
 import solutions.onz.muni.learning.domain.RunEmployee;
 import solutions.onz.muni.learning.domain.RunTrainingCatalogEntry;
@@ -125,5 +125,55 @@ class TrainingComplianceServiceTest {
         ComplianceSummary summary = service.summarize(List.of(matching, notMatching), List.of(entry), List.of(), asOf);
 
         assertThat(summary.overdueCount()).isEqualTo(1);
+    }
+
+    @Test
+    void computeDetailIncludesExpiryDateAndAppliesSameExclusionsAsSummarize() {
+        RunEmployee active = employee("E1", "Laboratoře", "Laborant", "aktivní");
+        RunEmployee terminated = employee("E2", "Laboratoře", "Laborant", "ukončen");
+        RunTrainingCatalogEntry mandatory = catalogEntry("BOZP-Z", 24, "VSICHNI");
+        RunTrainingCatalogEntry optional = catalogEntry("ANGL", null, "NEPOVINNE");
+        RunCompletedTraining completion = completed("E1", "BOZP-Z", LocalDate.of(2025, 1, 1), LocalDate.of(2027, 1, 1));
+
+        List<ComplianceRecord> records = service.computeDetail(
+                List.of(active, terminated), List.of(mandatory, optional), List.of(completion), asOf);
+
+        assertThat(records).hasSize(1);
+        ComplianceRecord record = records.get(0);
+        assertThat(record.idZamestnance()).isEqualTo("E1");
+        assertThat(record.kodSkoleni()).isEqualTo("BOZP-Z");
+        assertThat(record.status()).isEqualTo(ComplianceStatus.COMPLIANT);
+        assertThat(record.expiryDate()).isEqualTo(LocalDate.of(2027, 1, 1));
+    }
+
+    @Test
+    void computeDetailExpiryDateIsNullWhenTrainingNeverExpiresOrWasNeverCompleted() {
+        RunEmployee employee = employee("E1", "Any", "Vedoucí", "aktivní");
+        RunTrainingCatalogEntry neverExpires = catalogEntry("LEAD", null, "POZICE:Vedoucí");
+        RunTrainingCatalogEntry neverCompleted = catalogEntry("GDPR", 36, "VSICHNI");
+        RunCompletedTraining completion = completed("E1", "LEAD", LocalDate.of(2019, 1, 24), null);
+
+        List<ComplianceRecord> records = service.computeDetail(
+                List.of(employee), List.of(neverExpires, neverCompleted), List.of(completion), asOf);
+
+        ComplianceRecord neverExpiresRecord = records.stream().filter(r -> r.kodSkoleni().equals("LEAD")).findFirst().orElseThrow();
+        assertThat(neverExpiresRecord.status()).isEqualTo(ComplianceStatus.COMPLIANT);
+        assertThat(neverExpiresRecord.expiryDate()).isNull();
+
+        ComplianceRecord neverCompletedRecord = records.stream().filter(r -> r.kodSkoleni().equals("GDPR")).findFirst().orElseThrow();
+        assertThat(neverCompletedRecord.status()).isEqualTo(ComplianceStatus.OVERDUE);
+        assertThat(neverCompletedRecord.expiryDate()).isNull();
+    }
+
+    @Test
+    void summarizeStillProducesTheSameCountsAfterTheComputeDetailRefactor() {
+        RunEmployee employee = employee("E1", "Laboratoře", "Laborant", "aktivní");
+        RunTrainingCatalogEntry entry = catalogEntry("LAB-BEZ", 24, "UTVAR:Laboratoře");
+
+        ComplianceSummary summary = service.summarize(List.of(employee), List.of(entry), List.of(), asOf);
+
+        assertThat(summary.overdueCount()).isEqualTo(1);
+        assertThat(summary.compliantCount()).isZero();
+        assertThat(summary.expiringSoonCount()).isZero();
     }
 }

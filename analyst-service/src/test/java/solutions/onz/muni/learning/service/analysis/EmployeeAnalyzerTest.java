@@ -1,7 +1,7 @@
 package solutions.onz.muni.learning.service.analysis;
 
 import org.junit.jupiter.api.Test;
-import solutions.onz.muni.learning.domain.FindingSeverity;
+import solutions.onz.muni.learning.domain.enums.FindingSeverity;
 import solutions.onz.muni.learning.domain.RunEmployee;
 import solutions.onz.muni.learning.service.csv.SanitizationService;
 
@@ -105,5 +105,74 @@ class EmployeeAnalyzerTest {
         AnalysisResult<RunEmployee> result = analyzer.analyze(List.of(row));
 
         assertThat(result.rows().get(0).getPoznamka()).startsWith("'=");
+    }
+
+    @Test
+    void utvarSpellingVariantsDifferingOnlyByDiacriticsOrCaseAreMergedToTheMostCommonSpelling() {
+        Map<String, String> r1 = rowWithId("E0001");
+        r1.put("utvar", "Správa budov");
+        Map<String, String> r2 = rowWithId("E0002");
+        r2.put("utvar", "Správa budov");
+        Map<String, String> r3 = rowWithId("E0003");
+        r3.put("utvar", "Sprava budov");
+        Map<String, String> r4 = rowWithId("E0004");
+        r4.put("utvar", "SPRÁVA BUDOV");
+
+        AnalysisResult<RunEmployee> result = analyzer.analyze(List.of(r1, r2, r3, r4));
+
+        assertThat(result.rows()).extracting(RunEmployee::getUtvar)
+                .containsOnly("Správa budov");
+        assertThat(result.findings())
+                .anySatisfy(f -> {
+                    assertThat(f.severity()).isEqualTo(FindingSeverity.WARNING);
+                    assertThat(f.field()).isEqualTo("utvar");
+                    assertThat(f.message()).contains("Správa budov");
+                });
+    }
+
+    @Test
+    void utvarSpellingVariantTiesAreResolvedByKeepingTheFirstEncounteredSpelling() {
+        Map<String, String> r1 = rowWithId("E0001");
+        r1.put("utvar", "Sprava budov");
+        Map<String, String> r2 = rowWithId("E0002");
+        r2.put("utvar", "Správa budov");
+
+        AnalysisResult<RunEmployee> result = analyzer.analyze(List.of(r1, r2));
+
+        assertThat(result.rows()).extracting(RunEmployee::getUtvar)
+                .containsOnly("Sprava budov");
+    }
+
+    @Test
+    void pozicSpellingVariantsAreMergedIndependentlyOfUtvar() {
+        Map<String, String> r1 = rowWithId("E0001");
+        r1.put("pozice", "Vedoucí");
+        Map<String, String> r2 = rowWithId("E0002");
+        r2.put("pozice", "Vedoucí");
+        Map<String, String> r3 = rowWithId("E0003");
+        r3.put("pozice", "vedouci");
+
+        AnalysisResult<RunEmployee> result = analyzer.analyze(List.of(r1, r2, r3));
+
+        assertThat(result.rows()).extracting(RunEmployee::getPozice)
+                .containsOnly("Vedoucí");
+        assertThat(result.findings())
+                .anySatisfy(f -> assertThat(f.field()).isEqualTo("pozice"));
+    }
+
+    @Test
+    void consistentUtvarSpellingAcrossEmployeesProducesNoMergeFinding() {
+        Map<String, String> r1 = rowWithId("E0001");
+        Map<String, String> r2 = rowWithId("E0002");
+
+        AnalysisResult<RunEmployee> result = analyzer.analyze(List.of(r1, r2));
+
+        assertThat(result.findings()).isEmpty();
+    }
+
+    private Map<String, String> rowWithId(String id) {
+        Map<String, String> row = validRow();
+        row.put("id_zamestnance", id);
+        return row;
     }
 }

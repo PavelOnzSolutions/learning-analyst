@@ -7,7 +7,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import solutions.onz.muni.learning.domain.AppUser;
-import solutions.onz.muni.learning.domain.Role;
+import solutions.onz.muni.learning.domain.enums.Role;
 import solutions.onz.muni.learning.repository.AppUserRepository;
 
 import java.time.Instant;

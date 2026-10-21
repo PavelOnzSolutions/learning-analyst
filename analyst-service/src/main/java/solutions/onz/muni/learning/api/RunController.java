@@ -12,9 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import solutions.onz.muni.learning.api.dto.RunDetailResponse;
 import solutions.onz.muni.learning.api.dto.RunResponse;
 import solutions.onz.muni.learning.domain.ImportRun;
-import solutions.onz.muni.learning.domain.RunStatus;
+import solutions.onz.muni.learning.domain.enums.RunStatus;
+import solutions.onz.muni.learning.service.RunDetailService;
 import solutions.onz.muni.learning.service.RunService;
 
 @RestController
@@ -24,6 +26,7 @@ import solutions.onz.muni.learning.service.RunService;
 public class RunController {
 
     private final RunService runService;
+    private final RunDetailService runDetailService;
 
     @Operation(summary = "Create import run", description = "Uploads and analyzes the 4 CSV files (employees, training catalog, timeslots, completed trainings) and persists the result as a run awaiting review")
     @ApiResponse(responseCode = "201", description = "Run created and analyzed")
@@ -53,6 +56,14 @@ public class RunController {
     @GetMapping("/{id}")
     public RunResponse get(@PathVariable String id) {
         return RunResponse.from(runService.getRun(id));
+    }
+
+    @Operation(summary = "Get run detail", description = "Returns employees, timeslots, per-employee training compliance, and scheduling opportunities for a run's dashboard")
+    @ApiResponse(responseCode = "200", description = "Detail returned")
+    @ApiResponse(responseCode = "404", description = "Run not found")
+    @GetMapping("/{id}/detail")
+    public RunDetailResponse detail(@PathVariable String id) {
+        return runDetailService.getDetail(id);
     }
 
     @Operation(summary = "Confirm import run", description = "Finalizes a run that is pending review, marking it COMPLETED")

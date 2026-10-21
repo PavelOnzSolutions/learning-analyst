@@ -22,8 +22,9 @@ interface NavbarProps {
     toggleSidebar: () => void;
 }
 
-const BACKGROUND_OPTIONS: BackgroundType[] = ['orbs', 'starfield'];
+const BACKGROUND_OPTIONS: BackgroundType[] = ['orbs', 'starfield', 'particles', 'glyphs'];
 
+// @ts-ignore
 const Navbar: React.FC<NavbarProps> = ({toggleSidebar}) => {
     const {
         appearance,
@@ -63,7 +64,7 @@ const Navbar: React.FC<NavbarProps> = ({toggleSidebar}) => {
         <header
             className="bg-(--navbar-glass-bg) backdrop-blur-[50px] border-b border-(--glass-border) h-16 flex items-center justify-between px-4 sticky top-0 z-20 transition-all duration-300 shadow-sm">
             <div className="flex items-center gap-4">
-                <button
+                 <button
                     onClick={toggleSidebar}
                     aria-label="Toggle sidebar"
                     className="p-2 rounded-md hover:bg-(--gray-3) transition-colors xl:hidden"
@@ -71,7 +72,7 @@ const Navbar: React.FC<NavbarProps> = ({toggleSidebar}) => {
                     <Menu className="w-6 h-6 text-(--gray-11)"/>
                 </button>
                 <img src={logoSmall} alt="Learning Analyst Logo" className="w-8 h-8"/>
-                <h1 className="text-2xl">Learning Analyst</h1>
+                <h1 className="text-2xl animate-faerie-text">Learning Analyst</h1>
             </div>
             <div className="flex items-center gap-2 mx-2">
                 <Separator orientation="vertical"/>

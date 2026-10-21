@@ -12,10 +12,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.server.ResponseStatusException;
+import solutions.onz.muni.learning.api.dto.RunDetailResponse;
 import solutions.onz.muni.learning.domain.Counts;
 import solutions.onz.muni.learning.domain.ImportRun;
-import solutions.onz.muni.learning.domain.RunStatus;
+import solutions.onz.muni.learning.domain.enums.RunStatus;
 import solutions.onz.muni.learning.repository.AppUserRepository;
+import solutions.onz.muni.learning.service.RunDetailService;
 import solutions.onz.muni.learning.service.RunService;
 
 import java.util.List;
@@ -37,6 +39,9 @@ class RunControllerTest {
 
     @MockitoBean
     private RunService runService;
+
+    @MockitoBean
+    private RunDetailService runDetailService;
 
     @MockitoBean
     private AppUserRepository appUserRepository;
@@ -103,5 +108,14 @@ class RunControllerTest {
                         .param("name", "Test run")
                         .with(asUser("USER")))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void detailReturnsAssembledDashboardDataForAuthenticatedUser() throws Exception {
+        RunDetailResponse detail = new RunDetailResponse(List.of(), List.of(), List.of(), List.of());
+        when(runDetailService.getDetail("r1")).thenReturn(detail);
+
+        mockMvc.perform(get("/api/v1/runs/r1/detail").with(asUser("USER")))
+                .andExpect(status().isOk());
     }
 }

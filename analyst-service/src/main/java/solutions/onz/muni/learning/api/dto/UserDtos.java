@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import solutions.onz.muni.learning.domain.AppUser;
-import solutions.onz.muni.learning.domain.Role;
+import solutions.onz.muni.learning.domain.enums.Role;
 
 public final class UserDtos {
 

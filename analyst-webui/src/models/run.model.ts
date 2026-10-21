@@ -4,6 +4,8 @@ export type RunStatus = 'PENDING_REVIEW' | 'COMPLETED';
 
 export type FindingSeverity = 'ERROR' | 'WARNING';
 
+export type ComplianceStatus = 'COMPLIANT' | 'EXPIRING_SOON' | 'OVERDUE';
+
 export interface IFinding {
     severity: FindingSeverity;
     file: FileRole;

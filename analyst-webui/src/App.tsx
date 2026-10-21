@@ -10,6 +10,7 @@ import UserManagement from './pages/admin/users/UserManagement.tsx';
 import UserProfile from './pages/profile/UserProfile.tsx';
 import InsightsPage from './pages/insights/InsightsPage.tsx';
 import HistoryPage from './pages/history/HistoryPage.tsx';
+import RunDetailPage from './pages/history/RunDetailPage.tsx';
 import Error404 from './pages/error/Error404';
 import Error403 from './pages/error/Error403';
 import Error401 from './pages/error/Error401';
@@ -17,6 +18,7 @@ import Error401 from './pages/error/Error401';
 import { AuthProvider, useAuth } from './context/AuthContext';
 // @ts-ignore
 import './App.css';
+import Metrics from "./pages/admin/metrics/Metrics.tsx";
 
 const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -46,11 +48,13 @@ function App() {
                 <Route path="/" element={<Navigate to="/insights" replace />} />
                 <Route path="/insights" element={<InsightsPage />} />
                 <Route path="/history" element={<HistoryPage />} />
+                <Route path="/history/:id" element={<RunDetailPage />} />
 
                 <Route path="/admin/users" element={<UserManagement />} />
                 <Route path="/admin/api-tokens" element={<ApiTokens />} />
                 <Route path="/admin/api-docs" element={<ApiDocs />} />
                 <Route path="/admin/configuration" element={<Configuration />} />
+                <Route path="/admin/metrics" element={<Metrics />} />
 
                 <Route path="/profile" element={<UserProfile />} />
               </Route>

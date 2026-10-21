@@ -58,6 +58,7 @@ dependencies {
 
     // Observability
     runtimeOnly("io.micrometer:micrometer-registry-otlp")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     // Dev
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")

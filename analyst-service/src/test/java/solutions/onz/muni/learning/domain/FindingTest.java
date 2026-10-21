@@ -1,6 +1,10 @@
 package solutions.onz.muni.learning.domain;
 
 import org.junit.jupiter.api.Test;
+import solutions.onz.muni.learning.domain.enums.DelimiterSetting;
+import solutions.onz.muni.learning.domain.enums.FileRole;
+import solutions.onz.muni.learning.domain.enums.FindingSeverity;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
