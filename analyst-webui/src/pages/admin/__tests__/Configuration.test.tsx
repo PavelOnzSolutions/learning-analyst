@@ -64,4 +64,19 @@ describe('Configuration page', () => {
             expect(body).toEqual(settings);
         });
     });
+
+    it('disables the Save button while the initial settings fetch is still loading', () => {
+        mockFetch.mockImplementation((url: string, init?: RequestInit) => {
+            if (url === `${config.apiBaseUrl}/v1/admin/import-settings` && (!init || init.method === undefined)) {
+                return new Promise(() => {
+                    // never resolves - simulates the GET still being in flight
+                });
+            }
+            throw new Error(`Unexpected fetch to ${url}`);
+        });
+
+        renderPage();
+
+        expect(screen.getByText('Save')).toBeDisabled();
+    });
 });

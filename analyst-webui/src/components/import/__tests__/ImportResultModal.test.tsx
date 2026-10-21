@@ -102,6 +102,24 @@ describe('ImportResultModal', () => {
             expect(onConfirmed).toHaveBeenCalledWith(confirmed);
             expect(onOpenChange).toHaveBeenCalledWith(false);
         });
+        expect(screen.queryByText('Confirm with unresolved errors?')).not.toBeInTheDocument();
+    });
+
+    it('renders the findings table with severity, file role label, row, and field values', () => {
+        const run = baseRun({
+            counts: { ...baseRun().counts, errorCount: 1, warningCount: 1 },
+            findings: [
+                { severity: 'ERROR', file: 'EMPLOYEES', row: 0, field: null, message: 'Employees file missing required column' },
+                { severity: 'WARNING', file: 'TRAINING_CATALOG', row: 7, field: 'cena_na_osobu', message: 'Negative price after parsing' },
+            ],
+        });
+        renderModal(run);
+
+        expect(screen.getByText('File-level')).toBeInTheDocument();
+        expect(screen.getByText('7')).toBeInTheDocument();
+        expect(screen.getByText('Employees')).toBeInTheDocument();
+        expect(screen.getByText('Training Catalog')).toBeInTheDocument();
+        expect(screen.getByText('-')).toBeInTheDocument();
     });
 
     it('rejects a run and reports the id back to the caller', async () => {

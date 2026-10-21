@@ -75,7 +75,11 @@ const Configuration = () => {
     };
 
     const handleSave = () => {
-        saveMutation.mutate(localSettings);
+        const payload: ImportSettingsMap = {};
+        FILE_ROLE_ORDER.forEach((role) => {
+            payload[role] = localSettings[role] || 'AUTO';
+        });
+        saveMutation.mutate(payload);
     };
 
     return (
@@ -114,7 +118,7 @@ const Configuration = () => {
                         ))}
 
                         <Flex justify="end" mt="2">
-                            <Button variant="solid" onClick={handleSave} disabled={saveMutation.isPending}>
+                            <Button variant="solid" onClick={handleSave} disabled={isLoading || saveMutation.isPending}>
                                 {saveMutation.isPending ? 'Saving...' : 'Save'}
                             </Button>
                         </Flex>

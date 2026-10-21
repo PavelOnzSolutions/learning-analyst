@@ -79,7 +79,11 @@ export default function ImportResultModal({ run, open, onOpenChange, onConfirmed
     return (
         <>
             <Dialog.Root open={open} onOpenChange={onOpenChange}>
-                <Dialog.Content style={{ maxWidth: 700 }}>
+                <Dialog.Content
+                    style={{ maxWidth: 700 }}
+                    onEscapeKeyDown={(e) => e.preventDefault()}
+                    onPointerDownOutside={(e) => e.preventDefault()}
+                >
                     <Dialog.Title>{run.name}</Dialog.Title>
                     <Dialog.Description size="2" mb="4">
                         Parsed {run.counts.employees} employees, {run.counts.trainingCatalogEntries} training catalog entries,{' '}
@@ -149,7 +153,7 @@ export default function ImportResultModal({ run, open, onOpenChange, onConfirmed
                     <Dialog.Title>Confirm with unresolved errors?</Dialog.Title>
                     <Dialog.Description size="2" mb="4">
                         This run has {run.counts.errorCount} error{run.counts.errorCount !== 1 ? 's' : ''}. Confirming will
-                        import the data as-is, errors included. Are you sure?
+                        import the data as currently parsed. Rows that failed to parse are not included. Are you sure?
                     </Dialog.Description>
                     <Flex gap="3" mt="4" justify="end">
                         <Dialog.Close>
