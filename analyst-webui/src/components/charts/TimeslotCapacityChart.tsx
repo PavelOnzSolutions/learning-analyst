@@ -13,7 +13,7 @@ const FLAG_COLOR: Record<Flag, string> = {
     overbooked: 'var(--red-9)',
     cancelled: 'var(--gray-7)',
     'zero-capacity': 'var(--amber-9)',
-    normal: 'var(--accent-9)',
+    normal: 'var(--grass-9)',
 };
 
 const CANCELLED_STATUS = 'zrušeno';

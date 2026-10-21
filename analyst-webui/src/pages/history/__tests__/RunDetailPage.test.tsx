@@ -78,8 +78,13 @@ const run = {
 };
 
 const detail = {
-    employees: [],
-    timeslots: [],
+    employees: [
+        { idZamestnance: 'E1', jmeno: 'Tereza', prijmeni: 'Urbanová', utvar: 'Lab', pozice: 'Tech', stav: 'aktivní' },
+        { idZamestnance: 'E2', jmeno: 'Jan', prijmeni: 'Novák', utvar: 'Lab', pozice: 'Tech', stav: 'aktivní' },
+    ],
+    timeslots: [
+        { idTerminu: 'T1', kodSkoleni: 'BOZP-Z', datum: '2099-01-01', misto: 'Aula A', kapacita: 10, obsazeno: 5, stav: 'plánováno' },
+    ],
     compliance: [
         { idZamestnance: 'E1', employeeName: 'Tereza Urbanová', utvar: 'Lab', pozice: 'Tech', kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Základní školení', status: 'OVERDUE', expiryDate: null },
         { idZamestnance: 'E2', employeeName: 'Jan Novák', utvar: 'Lab', pozice: 'Tech', kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Základní školení', status: 'COMPLIANT', expiryDate: '2099-01-01' },
@@ -107,6 +112,10 @@ describe('RunDetailPage', () => {
         renderPage();
 
         await waitFor(() => expect(screen.getByText('October import')).toBeInTheDocument());
+        expect(screen.getByLabelText('Compliance by department')).toBeInTheDocument();
+        expect(screen.getByLabelText('Upcoming expirations')).toBeInTheDocument();
+        expect(screen.getByLabelText('Timeslot capacity utilization')).toBeInTheDocument();
+        expect(screen.getByLabelText('Headcount by Department')).toBeInTheDocument();
         // "Tereza Urbanová" legitimately appears in both the compliance table
         // and the scheduling-opportunities table (same person, two sections).
         expect(screen.getAllByText('Tereza Urbanová').length).toBeGreaterThan(0);

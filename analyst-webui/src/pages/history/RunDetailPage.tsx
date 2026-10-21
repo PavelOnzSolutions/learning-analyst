@@ -11,6 +11,10 @@ import type {ComplianceStatus} from '../../models/run.model';
 import type {IRunDetailResponse} from '../../models/run-detail.model';
 import {useToolbar} from "../../context/ToolbarContext.tsx";
 import PaginationControls from '../../components/system/PaginationControls';
+import ComplianceByDepartmentChart from '../../components/charts/ComplianceByDepartmentChart';
+import UpcomingExpirationsChart from '../../components/charts/UpcomingExpirationsChart';
+import TimeslotCapacityChart from '../../components/charts/TimeslotCapacityChart';
+import OrgHeadcountChart from '../../components/charts/OrgHeadcountChart';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -60,7 +64,7 @@ export default function RunDetailPage() {
     const [opportunitiesPageSize, setOpportunitiesPageSize] = useState(DEFAULT_PAGE_SIZE);
 
     useToolbar([
-        {id: 'back', label: 'Back', icon: ArrowLeft, onClick: () => navigate(-1)}
+        {id: 'back', label: 'Back', icon: ArrowLeft, onClick: () => navigate('/history')}
     ])
 
     const handleStatusFilterChange = (value: 'ALL' | ComplianceStatus) => {
@@ -147,6 +151,25 @@ export default function RunDetailPage() {
                         {run.counts.completedTrainings} completed trainings
                     </Flex>
                 </Badge>
+            </Flex>
+
+            <Flex direction="column" gap="6" mb="6">
+                <Flex direction="column" gap="2">
+                    <Text size="4" weight="bold">Compliance by Department</Text>
+                    <ComplianceByDepartmentChart records={detail.compliance}/>
+                </Flex>
+                <Flex direction="column" gap="2">
+                    <Text size="4" weight="bold">Upcoming Expirations</Text>
+                    <UpcomingExpirationsChart records={detail.compliance}/>
+                </Flex>
+                <Flex direction="column" gap="2">
+                    <Text size="4" weight="bold">Timeslot Capacity Utilization</Text>
+                    <TimeslotCapacityChart timeslots={detail.timeslots}/>
+                </Flex>
+                <Flex direction="column" gap="2">
+                    <Text size="4" weight="bold">Org Structure & Headcount</Text>
+                    <OrgHeadcountChart employees={detail.employees}/>
+                </Flex>
             </Flex>
 
             <Flex direction="column" gap="2" mb="4">
