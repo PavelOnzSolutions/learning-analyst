@@ -78,8 +78,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
         ${isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'}
         flex flex-col shadow-xl
       `}>
-                <div className="p-6 border-b border-[var(--glass-border)] xl:hidden">
-                    <h2 className="text-xl font-bold bg-gradient-to-r from-[var(--gray-12)] to-[var(--accent-11)] bg-clip-text text-transparent">Menu</h2>
+                <div className="p-6 border-b border-(--glass-border) xl:hidden">
+                    <h2 className="text-xl font-bold bg-gradient-to-r from-(--gray-12) to-(--accent-11) bg-clip-text text-transparent">Menu</h2>
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -89,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
                                 <>
                                     <button
                                         onClick={() => toggleExpand(item.label)}
-                                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg transition-colors text-[var(--gray-11)] hover:bg-[var(--gray-3)]"
+                                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg transition-colors text-(--gray-11) hover:bg-(--gray-3)"
                                     >
                                         <div className="flex items-center gap-3">
                                             <item.icon className="w-5 h-5" />
@@ -98,14 +98,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
                                         {expandedItems.includes(item.label) ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                                     </button>
                                     {expandedItems.includes(item.label) && (
-                                        <div className="ml-4 space-y-1 mt-1 border-l border-[var(--gray-5)] pl-2">
+                                        <div className="ml-4 space-y-1 mt-1 border-l border-(--gray-5) pl-2">
                                             {item.children.map(child => (
                                                 <NavLink
                                                     key={child.path}
                                                     to={child.path}
                                                     className={({ isActive }) => `
                                                         flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm
-                                                        ${isActive ? 'bg-[var(--accent-3)] text-[var(--accent-11)] font-medium' : 'text-[var(--gray-11)] hover:bg-[var(--gray-3)]'}
+                                                        ${isActive ? 'bg-(--accent-3) text-(--accent-11) font-medium' : 'text-(--gray-11) hover:bg-(--gray-3)'}
                                                     `}
                                                 >
                                                     <child.icon className="w-4 h-4" />
@@ -120,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
                                     to={item.path}
                                     className={({ isActive }) => `
                                         flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
-                                        ${isActive ? 'bg-[var(--accent-3)] text-[var(--accent-11)] font-medium' : 'text-[var(--gray-11)] hover:bg-[var(--gray-3)]'}
+                                        ${isActive ? 'bg-(--accent-3) text-(--accent-11) font-medium' : 'text-(--gray-11) hover:bg-(--gray-3)'}
                                     `}
                                 >
                                     <item.icon className="w-5 h-5" />
@@ -129,7 +129,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
                             ) : (
                                 <button
                                     onClick={item.onClick}
-                                    className="flex items-center gap-3 px-4 py-3 w-full rounded-lg transition-colors text-[var(--gray-11)] hover:bg-[var(--gray-3)]"
+                                    className="flex items-center gap-3 px-4 py-3 w-full rounded-lg transition-colors text-(--gray-11) hover:bg-(--gray-3)"
                                 >
                                     <item.icon className="w-5 h-5" />
                                     <span>{item.label}</span>
@@ -139,9 +139,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
                     ))}
                 </nav>
 
-                <div className="p-4 border-t border-[var(--gray-5)]">
+                <div className="p-4 border-t border-(--gray-5)">
                     <button
-                        className="flex items-center gap-3 px-4 py-1 w-full rounded-lg text-[var(--red-11)] hover:bg-[var(--red-3)] transition-colors"
+                        className="flex items-center gap-3 px-4 py-1 w-full rounded-lg text-(--red-11) hover:bg-(--red-3) transition-colors"
                         onClick={handleLogout}
                     >
                         <LogOut className="w-5 h-5" />
@@ -151,7 +151,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeSidebar }) => {
 
                 <Dialog.Root open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
                     <Dialog.Content style={{ maxWidth: 450 }}>
-                        <Dialog.Title>Logging out user <span className="text-[var(--accent-10)]">{user?.username}</span></Dialog.Title>
+                        <Dialog.Title>Logging out user <span className="text-(--accent-10)">{user?.username}</span></Dialog.Title>
                         <Dialog.Description size="2" mb="4">
                             Are you sure you want to log out from this session?
                         </Dialog.Description>
