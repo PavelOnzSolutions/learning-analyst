@@ -22,8 +22,7 @@ jobs:
           distribution: 'microsoft'
 
       - name: Gradle Build
-        working-directory: ./analyst-service
-        run: ./gradlew bootJar
+        run: ./gradlew :analyst-service:bootJar
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
