@@ -55,10 +55,10 @@ public class RunController {
         return RunResponse.from(runService.getRun(id));
     }
 
-    @Operation(summary = "Confirm import run", description = "Finalizes a run that is pending review and has no remaining ERROR findings, marking it COMPLETED")
+    @Operation(summary = "Confirm import run", description = "Finalizes a run that is pending review, marking it COMPLETED")
     @ApiResponse(responseCode = "200", description = "Run confirmed")
     @ApiResponse(responseCode = "404", description = "Run not found")
-    @ApiResponse(responseCode = "409", description = "Run is not pending review, or has unresolved errors")
+    @ApiResponse(responseCode = "409", description = "Run is not pending review")
     @PostMapping("/{id}/confirm")
     public RunResponse confirm(@PathVariable String id) {
         return RunResponse.from(runService.confirmRun(id));
