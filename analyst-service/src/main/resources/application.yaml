@@ -13,6 +13,7 @@ spring:
   mongodb:
     database: ${SPRING_DATA_MONGODB_DATABASE:analyst}
     uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/analyst}
+    auto-index-creation: true
   data:
     mongodb:
       auto-index-creation: true
