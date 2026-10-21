@@ -42,7 +42,7 @@ beforeEach(() => {
 describe('HistoryPage', () => {
     it('lists completed runs with their counts and navigates to the detail page on row click', async () => {
         mockFetch.mockImplementation((url: string) => {
-            if (url === `${config.apiBaseUrl}/v1/runs?status=COMPLETED&page=0&size=10&sort=createdAt,desc`) {
+            if (url === `${config.apiBaseUrl}/v1/runs?status=COMPLETED&page=0&size=20&sort=createdAt,desc`) {
                 return okJson({
                     content: [{
                         id: 'r1', name: 'October import', status: 'COMPLETED',
@@ -95,10 +95,10 @@ describe('HistoryPage', () => {
         }
 
         mockFetch.mockImplementation((url: string) => {
-            if (url === `${config.apiBaseUrl}/v1/runs?status=COMPLETED&page=0&size=10&sort=createdAt,desc`) {
+            if (url === `${config.apiBaseUrl}/v1/runs?status=COMPLETED&page=0&size=20&sort=createdAt,desc`) {
                 return okJson({ content: [runFixture('r1', 'Page one run')], totalElements: 2, totalPages: 2, number: 0 });
             }
-            if (url === `${config.apiBaseUrl}/v1/runs?status=COMPLETED&page=1&size=10&sort=createdAt,desc`) {
+            if (url === `${config.apiBaseUrl}/v1/runs?status=COMPLETED&page=1&size=20&sort=createdAt,desc`) {
                 return okJson({ content: [runFixture('r2', 'Page two run')], totalElements: 2, totalPages: 2, number: 1 });
             }
             throw new Error(`Unexpected fetch to ${url}`);
@@ -132,23 +132,23 @@ describe('HistoryPage', () => {
         }
 
         mockFetch.mockImplementation((url: string) => {
-            if (url === `${config.apiBaseUrl}/v1/runs?status=COMPLETED&page=0&size=10&sort=createdAt,desc`) {
-                return okJson({ content: [runFixture('r1', 'Ten per page run')], totalElements: 1, totalPages: 1, number: 0 });
-            }
             if (url === `${config.apiBaseUrl}/v1/runs?status=COMPLETED&page=0&size=20&sort=createdAt,desc`) {
-                return okJson({ content: [runFixture('r2', 'Twenty per page run')], totalElements: 1, totalPages: 1, number: 0 });
+                return okJson({ content: [runFixture('r1', 'Twenty per page run')], totalElements: 1, totalPages: 1, number: 0 });
+            }
+            if (url === `${config.apiBaseUrl}/v1/runs?status=COMPLETED&page=0&size=50&sort=createdAt,desc`) {
+                return okJson({ content: [runFixture('r2', 'Fifty per page run')], totalElements: 1, totalPages: 1, number: 0 });
             }
             throw new Error(`Unexpected fetch to ${url}`);
         });
 
         renderPage();
 
-        await waitFor(() => expect(screen.getByText('Ten per page run')).toBeInTheDocument());
-
-        fireEvent.click(screen.getByText('10'));
-        fireEvent.click(screen.getByText('20'));
-
         await waitFor(() => expect(screen.getByText('Twenty per page run')).toBeInTheDocument());
-        expect(screen.queryByText('Ten per page run')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('20'));
+        fireEvent.click(screen.getByText('50'));
+
+        await waitFor(() => expect(screen.getByText('Fifty per page run')).toBeInTheDocument());
+        expect(screen.queryByText('Twenty per page run')).not.toBeInTheDocument();
     });
 });
