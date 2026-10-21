@@ -28,7 +28,6 @@ export const accentColors = [
     'cyan',
     'teal',
     'jade',
-    'sage',
     'green',
     'grass',
     'lime',
