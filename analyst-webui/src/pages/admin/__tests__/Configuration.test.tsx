@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Theme } from '@radix-ui/themes';
 import { ToastProvider } from '../../../context/ToastContext';
@@ -52,28 +52,16 @@ describe('Configuration page', () => {
             throw new Error(`Unexpected fetch to ${url}`);
         });
 
-        await act(async () => {
-            renderPage();
-        });
+        renderPage();
 
-        // Wait for the initial fetch to complete and populate localSettings
-        await act(async () => {
-            await waitFor(() => {
-                expect(mockFetch.mock.calls.length).toBeGreaterThan(0);
-            });
-        });
+        await waitFor(() => expect(screen.getByText('Comma (,)')).toBeInTheDocument());
+        fireEvent.click(screen.getByText('Save'));
 
-        await act(async () => {
-            fireEvent.click(screen.getByText('Save'));
-        });
-
-        await act(async () => {
-            await waitFor(() => {
-                const putCall = mockFetch.mock.calls.find(([, init]) => init?.method === 'PUT');
-                expect(putCall).toBeDefined();
-                const body = JSON.parse((putCall![1] as RequestInit).body as string);
-                expect(body).toEqual(settings);
-            });
+        await waitFor(() => {
+            const putCall = mockFetch.mock.calls.find(([, init]) => init?.method === 'PUT');
+            expect(putCall).toBeDefined();
+            const body = JSON.parse((putCall![1] as RequestInit).body as string);
+            expect(body).toEqual(settings);
         });
     });
 });
