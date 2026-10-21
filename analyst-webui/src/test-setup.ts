@@ -14,6 +14,10 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
   } as unknown as typeof ResizeObserver;
 }
 
+if (typeof Element !== 'undefined' && typeof Element.prototype.scrollIntoView !== 'function') {
+  Element.prototype.scrollIntoView = () => {};
+}
+
 if (typeof window !== 'undefined' && typeof window.matchMedia !== 'function') {
   window.matchMedia = (query: string) => ({
     matches: false,
