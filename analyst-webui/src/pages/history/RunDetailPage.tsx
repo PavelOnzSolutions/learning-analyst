@@ -1,6 +1,17 @@
 import {useState} from 'react';
-import {Badge, Card, Flex, Select, Table, Text, Progress} from '@radix-ui/themes';
-import {ArrowLeft, CircleCheck, GraduationCap, History, Timer, User2} from 'lucide-react';
+import {Badge, Card, Flex, Grid, Heading, Select, Separator, Table, Text, Progress} from '@radix-ui/themes';
+import {
+    ArrowLeft,
+    Building2,
+    CalendarRange,
+    CircleCheck,
+    Clock,
+    GraduationCap,
+    History,
+    ShieldCheck,
+    Timer,
+    User2
+} from 'lucide-react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import PageHeader from '../../components/layout/PageHeader';
@@ -153,24 +164,44 @@ export default function RunDetailPage() {
                 </Badge>
             </Flex>
 
-            <Flex direction="column" gap="6" mb="6">
-                <Flex direction="column" gap="2">
-                    <Text size="4" weight="bold">Compliance by Department</Text>
-                    <ComplianceByDepartmentChart records={detail.compliance}/>
-                </Flex>
-                <Flex direction="column" gap="2">
-                    <Text size="4" weight="bold">Upcoming Expirations</Text>
-                    <UpcomingExpirationsChart records={detail.compliance}/>
-                </Flex>
-                <Flex direction="column" gap="2">
-                    <Text size="4" weight="bold">Timeslot Capacity Utilization</Text>
-                    <TimeslotCapacityChart timeslots={detail.timeslots}/>
-                </Flex>
-                <Flex direction="column" gap="2">
-                    <Text size="4" weight="bold">Org Structure & Headcount</Text>
-                    <OrgHeadcountChart employees={detail.employees}/>
-                </Flex>
-            </Flex>
+            <Grid columns={{initial: '1', lg: '2'}} gap="4" mb="6">
+                <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
+                    <Flex direction="column" gap="3">
+                        <Heading size="4" className="flex items-center gap-2">
+                            <ShieldCheck size={18} className="text-(--accent-9)"/> Compliance by Department
+                        </Heading>
+                        <Separator size="4"/>
+                        <ComplianceByDepartmentChart records={detail.compliance}/>
+                    </Flex>
+                </Card>
+                <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
+                    <Flex direction="column" gap="3">
+                        <Heading size="4" className="flex items-center gap-2">
+                            <Clock size={18} className="text-(--accent-9)"/> Upcoming Expirations
+                        </Heading>
+                        <Separator size="4"/>
+                        <UpcomingExpirationsChart records={detail.compliance}/>
+                    </Flex>
+                </Card>
+                <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
+                    <Flex direction="column" gap="3">
+                        <Heading size="4" className="flex items-center gap-2">
+                            <CalendarRange size={18} className="text-(--accent-9)"/> Timeslot Capacity Utilization
+                        </Heading>
+                        <Separator size="4"/>
+                        <TimeslotCapacityChart timeslots={detail.timeslots}/>
+                    </Flex>
+                </Card>
+                <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
+                    <Flex direction="column" gap="3">
+                        <Heading size="4" className="flex items-center gap-2">
+                            <Building2 size={18} className="text-(--accent-9)"/> Org Structure & Headcount
+                        </Heading>
+                        <Separator size="4"/>
+                        <OrgHeadcountChart employees={detail.employees}/>
+                    </Flex>
+                </Card>
+            </Grid>
 
             <Flex direction="column" gap="2" mb="4">
                 <Text size="4" weight="bold">Employees Requiring Mandatory Training</Text>

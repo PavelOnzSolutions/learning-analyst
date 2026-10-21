@@ -1,5 +1,5 @@
 import { scaleBand, scaleLinear, max } from 'd3';
-import { Text } from '@radix-ui/themes';
+import { Flex, Text } from '@radix-ui/themes';
 import type { ComplianceStatus } from '../../models/run.model';
 import type { IComplianceRecord } from '../../models/run-detail.model';
 
@@ -13,16 +13,25 @@ const STATUS_COLOR: Record<ComplianceStatus, string> = {
     EXPIRING_SOON: 'var(--amber-9)',
     OVERDUE: 'var(--red-9)',
 };
+const STATUS_LABEL: Record<ComplianceStatus, string> = {
+    COMPLIANT: 'Compliant',
+    EXPIRING_SOON: 'Expiring Soon',
+    OVERDUE: 'Overdue',
+};
 
-const WIDTH = 600;
-const HEIGHT = 300;
-const MARGIN = { top: 20, right: 20, bottom: 40, left: 40 };
+const WIDTH = 560;
+const ROW_HEIGHT = 34;
+const MARGIN_TOP = 10;
+const MARGIN_BOTTOM = 28;
+const MARGIN_RIGHT = 24;
 
 export default function ComplianceByDepartmentChart({ records }: ComplianceByDepartmentChartProps) {
     if (records.length === 0) {
         return <Text size="2" color="gray">No compliance data to chart.</Text>;
     }
 
+    // Horizontal bars: department labels sit to the left of each row, so they
+    // never need rotation or truncation no matter how many departments exist.
     const departments = Array.from(new Set(records.map((r) => r.utvar || 'Unknown')));
 
     const counts = departments.map((department) => {
@@ -32,49 +41,92 @@ export default function ComplianceByDepartmentChart({ records }: ComplianceByDep
         return { department, byStatus, total: departmentRecords.length };
     });
 
-    const innerWidth = WIDTH - MARGIN.left - MARGIN.right;
-    const innerHeight = HEIGHT - MARGIN.top - MARGIN.bottom;
+    const longestLabel = Math.max(...departments.map((d) => d.length));
+    const marginLeft = Math.min(170, Math.max(70, longestLabel * 7 + 16));
 
-    const xScale = scaleBand<string>().domain(departments).range([0, innerWidth]).padding(0.2);
-    const yMax = max(counts, (c) => c.total) || 1;
-    const yScale = scaleLinear().domain([0, yMax]).range([innerHeight, 0]);
+    const innerWidth = WIDTH - marginLeft - MARGIN_RIGHT;
+    const innerHeight = departments.length * ROW_HEIGHT;
+    const height = innerHeight + MARGIN_TOP + MARGIN_BOTTOM;
+
+    const yScale = scaleBand<string>().domain(departments).range([0, innerHeight]).padding(0.3);
+    const xMax = max(counts, (c) => c.total) || 1;
+    const xScale = scaleLinear().domain([0, xMax]).range([0, innerWidth]).nice();
+    const ticks = xScale.ticks(Math.min(5, xMax));
 
     return (
-        <svg width={WIDTH} height={HEIGHT} role="img" aria-label="Compliance by department">
-            <g transform={`translate(${MARGIN.left},${MARGIN.top})`}>
-                {counts.map(({ department, byStatus }) => {
-                    let yOffset = innerHeight;
-                    return (
-                        <g key={department}>
-                            {STATUS_ORDER.map((status) => {
-                                const value = byStatus[status];
-                                if (value === 0) return null;
-                                const barHeight = innerHeight - yScale(value);
-                                yOffset -= barHeight;
-                                return (
-                                    <rect
-                                        key={status}
-                                        data-status={status}
-                                        x={xScale(department)}
-                                        y={yOffset}
-                                        width={xScale.bandwidth()}
-                                        height={barHeight}
-                                        fill={STATUS_COLOR[status]}
-                                    />
-                                );
-                            })}
+        <Flex direction="column" gap="3">
+            <svg width="100%" viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label="Compliance by department">
+                <g transform={`translate(${marginLeft},${MARGIN_TOP})`}>
+                    {ticks.map((tick) => (
+                        <g key={tick}>
+                            <line
+                                x1={xScale(tick)} x2={xScale(tick)}
+                                y1={0} y2={innerHeight}
+                                stroke="var(--gray-a4)" strokeWidth={1}
+                            />
                             <text
-                                x={(xScale(department) || 0) + xScale.bandwidth() / 2}
-                                y={innerHeight + 20}
-                                textAnchor="middle"
-                                fontSize={12}
+                                x={xScale(tick)} y={innerHeight + 18}
+                                textAnchor="middle" fontSize={10}
+                                fill="var(--gray-10)"
                             >
-                                {department}
+                                {tick}
                             </text>
                         </g>
-                    );
-                })}
-            </g>
-        </svg>
+                    ))}
+
+                    {counts.map(({ department, byStatus, total }) => {
+                        let xOffset = 0;
+                        const bandY = yScale(department) || 0;
+                        return (
+                            <g key={department}>
+                                <text
+                                    x={-10} y={bandY + yScale.bandwidth() / 2}
+                                    textAnchor="end" dominantBaseline="middle"
+                                    fontSize={12} fill="var(--gray-12)"
+                                >
+                                    {department}
+                                </text>
+                                {STATUS_ORDER.map((status) => {
+                                    const value = byStatus[status];
+                                    if (value === 0) return null;
+                                    const barWidth = xScale(value) - xScale(0);
+                                    const x = xOffset;
+                                    xOffset += barWidth;
+                                    return (
+                                        <rect
+                                            key={status}
+                                            data-status={status}
+                                            x={x}
+                                            y={bandY}
+                                            width={barWidth}
+                                            height={yScale.bandwidth()}
+                                            rx={3}
+                                            fill={STATUS_COLOR[status]}
+                                        >
+                                            <title>{STATUS_LABEL[status]}: {value}</title>
+                                        </rect>
+                                    );
+                                })}
+                                <text
+                                    x={xScale(total) + 8} y={bandY + yScale.bandwidth() / 2}
+                                    dominantBaseline="middle" fontSize={11} fill="var(--gray-11)"
+                                >
+                                    {total}
+                                </text>
+                            </g>
+                        );
+                    })}
+                </g>
+            </svg>
+
+            <Flex gap="4" wrap="wrap">
+                {STATUS_ORDER.map((status) => (
+                    <Flex key={status} align="center" gap="2">
+                        <span style={{ width: 10, height: 10, borderRadius: 2, background: STATUS_COLOR[status], display: 'inline-block' }}/>
+                        <Text size="1" color="gray">{STATUS_LABEL[status]}</Text>
+                    </Flex>
+                ))}
+            </Flex>
+        </Flex>
     );
 }
