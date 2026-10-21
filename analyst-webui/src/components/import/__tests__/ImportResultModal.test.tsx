@@ -30,26 +30,59 @@ function baseRun(overrides: Partial<IRunResponse> = {}): IRunResponse {
     };
 }
 
+function renderModal(run: IRunResponse, onConfirmed = vi.fn(), onOpenChange = vi.fn(), onRejected = vi.fn()) {
+    const queryClient = new QueryClient();
+    render(
+        <QueryClientProvider client={queryClient}>
+            <ToastProvider>
+                <ImportResultModal run={run} open={true} onOpenChange={onOpenChange} onConfirmed={onConfirmed} onRejected={onRejected} />
+            </ToastProvider>
+        </QueryClientProvider>
+    );
+}
+
 beforeEach(() => {
     mockFetch.mockReset();
 });
 
 describe('ImportResultModal', () => {
-    it('disables Confirm when the run has unresolved errors', () => {
-        const run = baseRun({ counts: { ...baseRun().counts, errorCount: 1 } });
-        const queryClient = new QueryClient();
-        render(
-            <QueryClientProvider client={queryClient}>
-                <ToastProvider>
-                    <ImportResultModal run={run} open={true} onOpenChange={vi.fn()} onConfirmed={vi.fn()} onRejected={vi.fn()} />
-                </ToastProvider>
-            </QueryClientProvider>
-        );
+    it('shows a warning dialog instead of confirming immediately when the run has unresolved errors', () => {
+        const run = baseRun({ counts: { ...baseRun().counts, errorCount: 2 } });
+        renderModal(run);
 
-        expect(screen.getByText('Confirm').closest('button')).toBeDisabled();
+        fireEvent.click(screen.getByText('Confirm'));
+
+        expect(screen.getByText('Confirm with unresolved errors?')).toBeInTheDocument();
+        expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    it('confirms a clean run and reports the confirmed run back to the caller', async () => {
+    it('confirms a run with errors once the warning dialog is acknowledged', async () => {
+        const run = baseRun({ counts: { ...baseRun().counts, errorCount: 2 } });
+        const confirmed = baseRun({
+            status: 'COMPLETED', confirmedAt: '2026-01-02T00:00:00Z',
+            counts: { ...baseRun().counts, errorCount: 2 },
+        });
+        mockFetch.mockImplementation((url: string, init?: RequestInit) => {
+            if (url === `${config.apiBaseUrl}/v1/runs/r1/confirm` && init?.method === 'POST') {
+                return okJson(confirmed);
+            }
+            throw new Error(`Unexpected fetch to ${url}`);
+        });
+
+        const onConfirmed = vi.fn();
+        const onOpenChange = vi.fn();
+        renderModal(run, onConfirmed, onOpenChange);
+
+        fireEvent.click(screen.getByText('Confirm'));
+        fireEvent.click(screen.getByText('Confirm Anyway'));
+
+        await waitFor(() => {
+            expect(onConfirmed).toHaveBeenCalledWith(confirmed);
+            expect(onOpenChange).toHaveBeenCalledWith(false);
+        });
+    });
+
+    it('confirms a clean run immediately with no warning dialog', async () => {
         const run = baseRun();
         const confirmed = baseRun({ status: 'COMPLETED', confirmedAt: '2026-01-02T00:00:00Z' });
         mockFetch.mockImplementation((url: string, init?: RequestInit) => {
@@ -61,14 +94,7 @@ describe('ImportResultModal', () => {
 
         const onConfirmed = vi.fn();
         const onOpenChange = vi.fn();
-        const queryClient = new QueryClient();
-        render(
-            <QueryClientProvider client={queryClient}>
-                <ToastProvider>
-                    <ImportResultModal run={run} open={true} onOpenChange={onOpenChange} onConfirmed={onConfirmed} onRejected={vi.fn()} />
-                </ToastProvider>
-            </QueryClientProvider>
-        );
+        renderModal(run, onConfirmed, onOpenChange);
 
         fireEvent.click(screen.getByText('Confirm'));
 
@@ -89,14 +115,7 @@ describe('ImportResultModal', () => {
 
         const onRejected = vi.fn();
         const onOpenChange = vi.fn();
-        const queryClient = new QueryClient();
-        render(
-            <QueryClientProvider client={queryClient}>
-                <ToastProvider>
-                    <ImportResultModal run={run} open={true} onOpenChange={onOpenChange} onConfirmed={vi.fn()} onRejected={onRejected} />
-                </ToastProvider>
-            </QueryClientProvider>
-        );
+        renderModal(run, vi.fn(), onOpenChange, onRejected);
 
         fireEvent.click(screen.getByText('Reject'));
 
