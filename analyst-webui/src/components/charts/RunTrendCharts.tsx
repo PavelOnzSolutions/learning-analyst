@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { scaleLinear, scalePoint, line as d3Line, max } from 'd3';
 import { Card, Flex, Grid, Heading, Separator, Text } from '@radix-ui/themes';
-import { AlertTriangle, TrendingUp, Users } from 'lucide-react';
+import { AlertTriangle, Coins, TrendingUp, Users } from 'lucide-react';
 import type { IRunTrendPoint } from '../../models/insights.model';
 
 interface RunTrendChartsProps {
@@ -92,7 +92,7 @@ export default function RunTrendCharts({ runTrends }: RunTrendChartsProps) {
     }
 
     return (
-        <Grid columns={{ initial: '1', lg: '3' }} gap="4">
+        <Grid columns={{ initial: '1', sm: '2', lg: '4' }} gap="4">
             <ChartCard icon={TrendingUp} title="Compliance %">
                 <LineChart
                     title="Compliance %"
@@ -115,6 +115,13 @@ export default function RunTrendCharts({ runTrends }: RunTrendChartsProps) {
                         { label: 'Errors', color: 'var(--red-9)', key: 'findings', value: (p) => p.errorCount },
                         { label: 'Warnings', color: 'var(--amber-9)', key: 'findings', value: (p) => p.warningCount },
                     ]}
+                />
+            </ChartCard>
+            <ChartCard icon={Coins} title="Training Cost">
+                <LineChart
+                    title="Training Cost"
+                    runTrends={runTrends}
+                    series={[{ label: 'Total Cost (Kč)', color: 'var(--purple-9)', key: 'cost', value: (p) => p.totalCostKc }]}
                 />
             </ChartCard>
         </Grid>

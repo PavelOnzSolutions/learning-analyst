@@ -11,6 +11,7 @@ export interface IRunTrendPoint {
     overdueCount: number;
     errorCount: number;
     warningCount: number;
+    totalCostKc: number;
 }
 
 export interface IInsightsOverviewResponse {

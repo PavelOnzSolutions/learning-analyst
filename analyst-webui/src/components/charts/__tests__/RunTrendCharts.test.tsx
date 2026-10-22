@@ -7,7 +7,7 @@ function point(overrides: Partial<IRunTrendPoint>): IRunTrendPoint {
     return {
         runId: 'r1', runName: 'Run 1', confirmedAt: '2026-10-01T00:00:00Z',
         employees: 10, compliantCount: 7, expiringSoonCount: 1, overdueCount: 2,
-        errorCount: 0, warningCount: 1,
+        errorCount: 0, warningCount: 1, totalCostKc: 450,
         ...overrides,
     };
 }
@@ -24,6 +24,7 @@ describe('RunTrendCharts', () => {
         expect(container.querySelectorAll('circle[data-series="compliance"]')).toHaveLength(2);
         expect(container.querySelectorAll('circle[data-series="headcount"]')).toHaveLength(2);
         expect(container.querySelectorAll('circle[data-series="findings"]')).toHaveLength(4); // 2 runs x (error+warning)
+        expect(container.querySelectorAll('circle[data-series="cost"]')).toHaveLength(2);
     });
 
     it('shows an empty-state message when there are no completed runs yet', () => {

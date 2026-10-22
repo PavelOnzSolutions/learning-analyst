@@ -116,6 +116,7 @@ describe('RunDetailPage', () => {
         expect(screen.getByLabelText('Upcoming expirations')).toBeInTheDocument();
         expect(screen.getByLabelText('Timeslot capacity utilization')).toBeInTheDocument();
         expect(screen.getByLabelText('Headcount by Department')).toBeInTheDocument();
+        expect(screen.getByLabelText('Training cost by department')).toBeInTheDocument();
         // "Tereza Urbanová" legitimately appears in both the compliance table
         // and the scheduling-opportunities table (same person, two sections).
         expect(screen.getAllByText('Tereza Urbanová').length).toBeGreaterThan(0);

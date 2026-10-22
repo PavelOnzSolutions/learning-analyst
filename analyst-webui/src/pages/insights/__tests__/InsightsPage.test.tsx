@@ -28,7 +28,7 @@ function renderPage() {
 
 const overview = {
     runTrends: [
-        { runId: 'r1', runName: 'October import', confirmedAt: '2026-10-01T00:00:00Z', employees: 10, compliantCount: 7, expiringSoonCount: 1, overdueCount: 2, errorCount: 0, warningCount: 1 },
+        { runId: 'r1', runName: 'October import', confirmedAt: '2026-10-01T00:00:00Z', employees: 10, compliantCount: 7, expiringSoonCount: 1, overdueCount: 2, errorCount: 0, warningCount: 1, totalCostKc: 450 },
     ],
 };
 

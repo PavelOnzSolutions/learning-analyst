@@ -8,6 +8,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import solutions.onz.muni.learning.config.ApplicationProperties;
@@ -22,6 +23,7 @@ import java.util.Date;
 public class JwtService {
 
     private final RSAKey rsaKey;
+    @Getter
     private final long expirySeconds;
     private final String issuer;
 
@@ -68,7 +70,4 @@ public class JwtService {
         return rsaKey.toRSAPublicKey();
     }
 
-    public long getExpirySeconds() {
-        return expirySeconds;
-    }
 }
