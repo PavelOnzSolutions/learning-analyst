@@ -64,6 +64,8 @@ const STATUS_LABEL: Record<ComplianceStatus, string> = {
     COMPLIANT: 'Compliant',
 };
 
+const formatCost = (amount: number | null): string => amount === null ? '—' : `${amount.toLocaleString()} Kč`;
+
 export default function RunDetailPage() {
     usePageTitle('Run Detail');
     const navigate = useNavigate();

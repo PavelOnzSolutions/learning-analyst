@@ -83,7 +83,7 @@ public class InsightsService {
 
             for (ComplianceRecord record : records) {
                 history.add(new EmployeeHistoryPoint(run.getId(), run.getName(), run.getConfirmedAt(),
-                        record.kodSkoleni(), record.nazevSkoleni(), record.status(), record.expiryDate()));
+                        record.kodSkoleni(), record.nazevSkoleni(), record.status(), record.expiryDate(), record.costKc()));
             }
         }
 

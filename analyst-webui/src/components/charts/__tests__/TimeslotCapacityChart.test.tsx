@@ -6,7 +6,7 @@ import type { ITimeslotSummary } from '../../../models/run-detail.model';
 function timeslot(overrides: Partial<ITimeslotSummary>): ITimeslotSummary {
     return {
         idTerminu: 'T1', kodSkoleni: 'BOZP-Z', datum: '2026-02-01', misto: 'Aula A',
-        kapacita: 10, obsazeno: 5, stav: 'plánováno',
+        kapacita: 10, obsazeno: 5, stav: 'plánováno', costPerPerson: null,
         ...overrides,
     };
 }

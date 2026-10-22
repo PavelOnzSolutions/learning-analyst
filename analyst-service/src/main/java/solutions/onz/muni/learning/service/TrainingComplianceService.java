@@ -7,6 +7,7 @@ import solutions.onz.muni.learning.domain.RunEmployee;
 import solutions.onz.muni.learning.domain.RunTrainingCatalogEntry;
 import solutions.onz.muni.learning.service.analysis.PovinneProRule;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -45,9 +46,10 @@ public class TrainingComplianceService {
                 }
                 ComplianceStatus status = classify(employee, entry, completedTrainings, asOf);
                 LocalDate expiryDate = resolveExpiryForDisplay(employee, entry, completedTrainings);
+                BigDecimal costKc = resolveCostForDisplay(employee, entry, completedTrainings);
                 records.add(new ComplianceRecord(
                         employee.getIdZamestnance(), formatName(employee), employee.getUtvar(), employee.getPozice(),
-                        entry.getKod(), entry.getNazev(), status, expiryDate));
+                        entry.getKod(), entry.getNazev(), status, expiryDate, costKc));
             }
         }
 
@@ -98,6 +100,12 @@ public class TrainingComplianceService {
             return mostRecent.getDatumAbsolvovani().plusMonths(entry.getPlatnostMesicu());
         }
         return null;
+    }
+
+    private BigDecimal resolveCostForDisplay(RunEmployee employee, RunTrainingCatalogEntry entry,
+                                              List<RunCompletedTraining> completedTrainings) {
+        RunCompletedTraining mostRecent = findMostRecentCompletion(employee, entry, completedTrainings);
+        return mostRecent == null ? null : mostRecent.getCenaKc();
     }
 
     private RunCompletedTraining findMostRecentCompletion(RunEmployee employee, RunTrainingCatalogEntry entry,

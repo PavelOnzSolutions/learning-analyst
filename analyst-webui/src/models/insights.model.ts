@@ -30,6 +30,7 @@ export interface IEmployeeHistoryPoint {
     nazevSkoleni: string | null;
     status: ComplianceStatus;
     expiryDate: string | null;
+    costKc: number | null;
 }
 
 export interface IEmployeeHistoryResponse {

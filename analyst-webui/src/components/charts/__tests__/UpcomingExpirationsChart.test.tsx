@@ -6,7 +6,7 @@ import type { IComplianceRecord } from '../../../models/run-detail.model';
 function record(expiryDate: string | null): IComplianceRecord {
     return {
         idZamestnance: 'E1', employeeName: 'Test', utvar: 'Lab', pozice: 'Tech',
-        kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Training', status: 'EXPIRING_SOON', expiryDate,
+        kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Training', status: 'EXPIRING_SOON', expiryDate, costKc: null,
     };
 }
 
