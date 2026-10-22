@@ -42,12 +42,21 @@ const history = {
     ],
 };
 
+const schedulingSuggestions = {
+    basedOnRunId: 'r1',
+    basedOnRunName: 'October import',
+    suggestions: [
+        { idZamestnance: 'E1', employeeName: 'Tereza Urbanová', kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Základní školení', status: 'OVERDUE', idTerminu: 'T1', datum: '2026-11-01', kapacita: 10, obsazeno: 5 },
+    ],
+};
+
 beforeEach(() => {
     mockFetch.mockReset();
     mockFetch.mockImplementation((url: string) => {
         if (url === `${config.apiBaseUrl}/v1/insights/overview`) return okJson(overview);
         if (url === `${config.apiBaseUrl}/v1/insights/employees`) return okJson(employees);
         if (url === `${config.apiBaseUrl}/v1/insights/employees/E1/history`) return okJson(history);
+        if (url === `${config.apiBaseUrl}/v1/insights/scheduling-suggestions`) return okJson(schedulingSuggestions);
         throw new Error(`Unexpected fetch to ${url}`);
     });
 });
@@ -74,5 +83,14 @@ describe('InsightsPage', () => {
 
         await waitFor(() => expect(screen.getByText('BOZP-Z')).toBeInTheDocument());
         expect(screen.getByText('Overdue')).toBeInTheDocument();
+    });
+
+    it('shows scheduling suggestions from the most recently confirmed run', async () => {
+        renderPage();
+
+        await waitFor(() => expect(screen.getByText(/Based on: October import/i)).toBeInTheDocument());
+        expect(screen.getByText('Scheduling Suggestions')).toBeInTheDocument();
+        expect(screen.getByText('Tereza Urbanová')).toBeInTheDocument();
+        expect(screen.getByText('BOZP-Z')).toBeInTheDocument();
     });
 });

@@ -1,4 +1,5 @@
 import type { ComplianceStatus } from './run.model';
+import type { ISchedulingOpportunity } from './run-detail.model';
 
 export interface IRunTrendPoint {
     runId: string;
@@ -35,4 +36,10 @@ export interface IEmployeeHistoryResponse {
     idZamestnance: string;
     employeeName: string;
     history: IEmployeeHistoryPoint[];
+}
+
+export interface IInsightsSchedulingSuggestionsResponse {
+    basedOnRunId: string | null;
+    basedOnRunName: string | null;
+    suggestions: ISchedulingOpportunity[];
 }
