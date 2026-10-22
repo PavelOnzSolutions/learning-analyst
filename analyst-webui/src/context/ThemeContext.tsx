@@ -144,7 +144,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }, [radiusType]);
 
     useEffect(() => {
-        localStorage.setItem('useAccentColorForBackground', String(useAccentColorForBackground));
+        localStorage.setItem('useAccentColorForBackground', String(useAccentColorForBackground) || 'true');
     }, [useAccentColorForBackground]);
 
     useEffect(() => {

@@ -1,4 +1,4 @@
-package solutions.onz.platform.demon.manager.security;
+package solutions.onz.muni.learning.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

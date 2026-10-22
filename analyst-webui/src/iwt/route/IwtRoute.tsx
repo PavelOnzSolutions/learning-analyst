@@ -1,12 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../auth/useAuth';
-import { loginLocal as requestLocalLogin, LocalLoginError } from '../../auth/localAuth';
-import { useCustomerDashboard, useInstances, useSubscription } from '../../api/hooks';
+
 import { mountIWT, type MountHandle } from '../app/mount';
 import { iwtCtxFor, RealAuthAdapter, RealProfileAdapter } from '../providers/real-auth';
 import { GUEST_TREE, useIwtMenu } from '../providers/real-menu';
 import { dashboardPanelHtml, instancesPanelHtml, subscriptionPanelHtml, loadingPanelHtml } from '../render/overlay/real-panels';
+import {useAuth} from "../../context/AuthContext.tsx";
 
 /**
  * Mounts the real IWT app at /iwt/app and /iwt/app/:section. Unlike /app,
@@ -23,9 +22,6 @@ export function IwtRoute() {
   const { section } = useParams<{ section?: string }>();
 
   const menuQuery = useIwtMenu(auth.isAuthenticated);
-  const dashboardQuery = useCustomerDashboard(auth.isAuthenticated);
-  const instancesQuery = useInstances(auth.isAuthenticated);
-  const subscriptionQuery = useSubscription(auth.isAuthenticated);
 
   // Mount the render loop once. login/navigate identities are stable enough
   // (useAuth's login is memoized; react-router's navigate is stable) that a
@@ -39,15 +35,14 @@ export function IwtRoute() {
       profileProvider: new RealProfileAdapter(),
       initialTree: auth.isAuthenticated ? [] : GUEST_TREE,
       navigate: (to) => navigate(`/iwt/app/${to}`, { replace: true }),
-      login: () => auth.login(),
       loginLocal: async ({ email, password }) => {
         try {
-          await requestLocalLogin(email, password);
+          await auth.login({login: email, password: password});
           // Forces a re-render so useAuth() picks up the new local session below.
           navigate('/iwt/app', { replace: true });
           return { ok: true, value: undefined };
         } catch (err) {
-          return { ok: false, error: err instanceof LocalLoginError ? err.message : 'Sign-in failed. Try again.' };
+          return { ok: false, error: 'Sign-in failed. Try again.' };
         }
       },
     });

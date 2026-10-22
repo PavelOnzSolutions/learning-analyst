@@ -1,11 +1,11 @@
-package solutions.onz.platform.demon.manager.service;
+package solutions.onz.muni.learning.service;
+
+import org.springframework.stereotype.Component;
+import solutions.onz.muni.learning.api.dto.MenuNodeDto;
+import solutions.onz.muni.learning.security.CustomerContext;
+
 
 import java.util.List;
-import org.springframework.stereotype.Component;
-import solutions.onz.platform.demon.manager.api.dto.MenuNodeDto;
-import solutions.onz.platform.demon.manager.api.dto.MenuNodeDto.MenuActionDto.Command;
-import solutions.onz.platform.demon.manager.api.dto.MenuNodeDto.MenuActionDto.MorphPage;
-import solutions.onz.platform.demon.manager.security.CustomerContext;
 
 /**
  * Builds the IWT orb tree for {@code GET /api/v1/iwt/menu}. The spine tree is
@@ -19,12 +19,12 @@ public class MenuService {
     public List<MenuNodeDto> menuFor(CustomerContext ctx) {
         return List.of(
                 new MenuNodeDto("dashboard", "see my dashboard", "teal", null,
-                        new MorphPage("dashboard")),
+                        new MenuNodeDto.MenuActionDto.MorphPage("dashboard")),
                 new MenuNodeDto("instances", "browse my instances", "violet", null,
-                        new MorphPage("instances")),
+                        new MenuNodeDto.MenuActionDto.MorphPage("instances")),
                 new MenuNodeDto("subscription", "manage my subscription", "amber", null,
-                        new MorphPage("subscription")),
+                        new MenuNodeDto.MenuActionDto.MorphPage("subscription")),
                 new MenuNodeDto("sign-out", "sign out", "gray", null,
-                        new Command("sign-out")));
+                        new MenuNodeDto.MenuActionDto.Command("sign-out")));
     }
 }

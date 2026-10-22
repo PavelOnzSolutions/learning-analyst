@@ -1,4 +1,4 @@
-package solutions.onz.muni.learning.security;
+package solutions.onz.muni.learning.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +26,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import solutions.onz.muni.learning.config.ApplicationProperties;
 import solutions.onz.muni.learning.repository.ApiTokenRepository;
 import solutions.onz.muni.learning.service.JwtService;
 

@@ -1,8 +1,8 @@
-package solutions.onz.platform.demon.manager.security;
+package solutions.onz.muni.learning.security;
 
+import solutions.onz.muni.learning.domain.enums.Role;
 import java.util.Set;
-import solutions.onz.platform.demon.manager.domain.enums.Role;
 
 public record CustomerContext(String userOid, String email, String customerId, Set<Role> roles) {
-    public boolean isPlatformAdmin() { return roles.contains(Role.PLATFORM_ADMIN); }
+    public boolean isPlatformAdmin() { return roles.contains(Role.ADMIN); }
 }

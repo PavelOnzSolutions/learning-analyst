@@ -1,27 +1,33 @@
-package solutions.onz.platform.demon.manager.api;
+package solutions.onz.muni.learning.api;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import solutions.onz.platform.demon.manager.api.dto.MenuNodeDto;
-import solutions.onz.platform.demon.manager.security.CurrentUser;
-import solutions.onz.platform.demon.manager.security.CustomerContext;
-import solutions.onz.platform.demon.manager.service.MenuService;
+import solutions.onz.muni.learning.api.dto.MenuNodeDto;
+import solutions.onz.muni.learning.security.CurrentUser;
+import solutions.onz.muni.learning.security.CustomerContext;
+import solutions.onz.muni.learning.service.MenuService;
+
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/iwt")
+@RequiredArgsConstructor
+@Tag(name = "IWT UI Data", description = "IWT UI structural data")
 public class MenuController {
 
     private final MenuService menuService;
 
-    public MenuController(MenuService menuService) {
-        this.menuService = menuService;
-    }
-
+    @Operation(summary = "Get menu structure", description = "Returns a complete menu layout and command mappings")
+    @ApiResponse(responseCode = "200", description = "Menu returned")
     @GetMapping("/menu")
-    @PreAuthorize("hasAnyRole('CUSTOMER_ADMIN','CUSTOMER_MEMBER')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public List<MenuNodeDto> menu(@CurrentUser CustomerContext ctx) {
         return menuService.menuFor(ctx);
     }

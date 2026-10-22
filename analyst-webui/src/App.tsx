@@ -15,6 +15,8 @@ import Error404 from './pages/error/Error404';
 import Error403 from './pages/error/Error403';
 import Error401 from './pages/error/Error401';
 
+// import { IwtRoute } from './iwt/route/IwtRoute';
+
 import { AuthProvider, useAuth } from './context/AuthContext';
 // @ts-ignore
 import './App.css';
@@ -62,7 +64,10 @@ function App() {
                 <Route path="/documentation/about" element={<About />} />
               </Route>
             </Route>
-
+            {/*}
+            <Route path="/iwt/app" element={<IwtRoute />} />
+            <Route path="/iwt/app/:section" element={<IwtRoute />} />
+*/}
             <Route element={<ErrorLayout />}>
               <Route path="/403" element={<Error403 />} />
               <Route path="/401" element={<Error401 />} />

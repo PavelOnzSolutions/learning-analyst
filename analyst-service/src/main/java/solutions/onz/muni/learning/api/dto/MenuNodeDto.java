@@ -1,4 +1,4 @@
-package solutions.onz.platform.demon.manager.api.dto;
+package solutions.onz.muni.learning.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

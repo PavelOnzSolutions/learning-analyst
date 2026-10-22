@@ -3,6 +3,7 @@ package solutions.onz.muni.learning.security;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import solutions.onz.muni.learning.config.SecurityConfig;
 
 import java.time.Instant;
 import java.util.Collection;

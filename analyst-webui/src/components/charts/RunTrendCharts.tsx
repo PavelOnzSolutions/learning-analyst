@@ -112,8 +112,8 @@ export default function RunTrendCharts({ runTrends }: RunTrendChartsProps) {
                     title="Findings"
                     runTrends={runTrends}
                     series={[
-                        { label: 'Errors', color: 'var(--red-9)', key: 'findings', value: (p) => p.errorCount },
-                        { label: 'Warnings', color: 'var(--amber-9)', key: 'findings', value: (p) => p.warningCount },
+                        { label: 'Errors', color: 'var(--red-9)', key: 'findings-e', value: (p) => p.errorCount },
+                        { label: 'Warnings', color: 'var(--amber-9)', key: 'findings-w', value: (p) => p.warningCount },
                     ]}
                 />
             </ChartCard>
