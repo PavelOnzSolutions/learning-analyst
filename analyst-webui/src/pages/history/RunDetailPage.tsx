@@ -64,7 +64,7 @@ const STATUS_LABEL: Record<ComplianceStatus, string> = {
     COMPLIANT: 'Compliant',
 };
 
-const formatCost = (amount: number | null): string => amount === null ? '—' : `${amount.toLocaleString()} Kč`;
+const formatCost = (amount: number | null | undefined): string => amount == null ? '—' : `${amount.toLocaleString()} Kč`;
 
 export default function RunDetailPage() {
     usePageTitle('Run Detail');
@@ -227,6 +227,7 @@ export default function RunDetailPage() {
                         <Table.ColumnHeaderCell>Training</Table.ColumnHeaderCell>
                         <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                         <Table.ColumnHeaderCell>Expiry</Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>Cost</Table.ColumnHeaderCell>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -239,6 +240,7 @@ export default function RunDetailPage() {
                             <Table.Cell><Badge
                                 color={STATUS_BADGE_COLOR[record.status]}>{STATUS_LABEL[record.status]}</Badge></Table.Cell>
                             <Table.Cell>{record.expiryDate ? new Date(record.expiryDate).toLocaleDateString() : '—'}</Table.Cell>
+                            <Table.Cell>{formatCost(record.costKc)}</Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>
@@ -261,6 +263,7 @@ export default function RunDetailPage() {
                         <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                         <Table.ColumnHeaderCell>Upcoming Timeslot</Table.ColumnHeaderCell>
                         <Table.ColumnHeaderCell>Capacity</Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>Cost / Person</Table.ColumnHeaderCell>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -272,6 +275,7 @@ export default function RunDetailPage() {
                                 color={STATUS_BADGE_COLOR[opportunity.status]}>{STATUS_LABEL[opportunity.status]}</Badge></Table.Cell>
                             <Table.Cell>{opportunity.datum ? new Date(opportunity.datum).toLocaleDateString() : '—'}</Table.Cell>
                             <Table.Cell>{opportunity.obsazeno} / {opportunity.kapacita}</Table.Cell>
+                            <Table.Cell>{formatCost(opportunity.costPerPerson)}</Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>

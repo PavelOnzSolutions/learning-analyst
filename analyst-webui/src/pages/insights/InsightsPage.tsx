@@ -51,6 +51,8 @@ const STATUS_LABEL: Record<ComplianceStatus, string> = {
     COMPLIANT: 'Compliant',
 };
 
+const formatCost = (amount: number | null | undefined): string => amount == null ? '—' : `${amount.toLocaleString()} Kč`;
+
 const InsightsPage = () => {
     usePageTitle('Insights');
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | undefined>(undefined);
@@ -115,6 +117,7 @@ const InsightsPage = () => {
                                             <Table.ColumnHeaderCell>Training</Table.ColumnHeaderCell>
                                             <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                                             <Table.ColumnHeaderCell>Expiry</Table.ColumnHeaderCell>
+                                            <Table.ColumnHeaderCell>Cost</Table.ColumnHeaderCell>
                                         </Table.Row>
                                     </Table.Header>
                                     <Table.Body>
@@ -126,6 +129,7 @@ const InsightsPage = () => {
                                                 <Table.Cell><Badge
                                                     color={STATUS_BADGE_COLOR[point.status]}>{STATUS_LABEL[point.status]}</Badge></Table.Cell>
                                                 <Table.Cell>{point.expiryDate ? new Date(point.expiryDate).toLocaleDateString() : '—'}</Table.Cell>
+                                                <Table.Cell>{formatCost(point.costKc)}</Table.Cell>
                                             </Table.Row>
                                         ))}
                                     </Table.Body>
@@ -151,6 +155,7 @@ const InsightsPage = () => {
                                     <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                                     <Table.ColumnHeaderCell>Upcoming Timeslot</Table.ColumnHeaderCell>
                                     <Table.ColumnHeaderCell>Capacity</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Cost / Person</Table.ColumnHeaderCell>
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
@@ -161,6 +166,7 @@ const InsightsPage = () => {
                                         <Table.Cell><Badge color={STATUS_BADGE_COLOR[s.status]}>{STATUS_LABEL[s.status]}</Badge></Table.Cell>
                                         <Table.Cell>{s.datum ? new Date(s.datum).toLocaleDateString() : '—'}</Table.Cell>
                                         <Table.Cell>{s.obsazeno} / {s.kapacita}</Table.Cell>
+                                        <Table.Cell>{formatCost(s.costPerPerson)}</Table.Cell>
                                     </Table.Row>
                                 ))}
                             </Table.Body>
