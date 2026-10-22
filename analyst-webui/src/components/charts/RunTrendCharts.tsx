@@ -1,5 +1,7 @@
+import type { ReactNode } from 'react';
 import { scaleLinear, scalePoint, line as d3Line, max } from 'd3';
-import { Flex, Text } from '@radix-ui/themes';
+import { Card, Flex, Grid, Heading, Separator, Text } from '@radix-ui/themes';
+import { AlertTriangle, TrendingUp, Users } from 'lucide-react';
 import type { IRunTrendPoint } from '../../models/insights.model';
 
 interface RunTrendChartsProps {
@@ -31,7 +33,6 @@ function LineChart({ title, runTrends, series }: LineChartProps) {
 
     return (
         <Flex direction="column" gap="2">
-            <Text size="2" weight="bold" color="gray">{title}</Text>
             <svg width="100%" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={title}>
                 <g transform={`translate(${MARGIN.left},${MARGIN.top})`}>
                     {series.map((s) => {
@@ -70,31 +71,52 @@ function LineChart({ title, runTrends, series }: LineChartProps) {
     );
 }
 
+function ChartCard({ icon, title, children }: { icon: typeof TrendingUp; title: string; children: ReactNode }) {
+    const Icon = icon;
+    return (
+        <Card size="3" className="glass-card" style={{ background: 'var(--glass-bg)' }}>
+            <Flex direction="column" gap="3">
+                <Heading size="4" className="flex items-center gap-2">
+                    <Icon size={18} className="text-(--accent-9)"/> {title}
+                </Heading>
+                <Separator size="4"/>
+                {children}
+            </Flex>
+        </Card>
+    );
+}
+
 export default function RunTrendCharts({ runTrends }: RunTrendChartsProps) {
     if (runTrends.length === 0) {
         return <Text size="2" color="gray">No completed runs yet. Trends will appear here once at least one import has been confirmed.</Text>;
     }
 
     return (
-        <Flex gap="4" wrap="wrap">
-            <LineChart
-                title="Compliance %"
-                runTrends={runTrends}
-                series={[{ label: 'Compliant %', color: 'var(--green-9)', key: 'compliance', value: compliancePercent }]}
-            />
-            <LineChart
-                title="Headcount"
-                runTrends={runTrends}
-                series={[{ label: 'Employees', color: 'var(--accent-9)', key: 'headcount', value: (p) => p.employees }]}
-            />
-            <LineChart
-                title="Findings"
-                runTrends={runTrends}
-                series={[
-                    { label: 'Errors', color: 'var(--red-9)', key: 'findings', value: (p) => p.errorCount },
-                    { label: 'Warnings', color: 'var(--amber-9)', key: 'findings', value: (p) => p.warningCount },
-                ]}
-            />
-        </Flex>
+        <Grid columns={{ initial: '1', lg: '3' }} gap="4">
+            <ChartCard icon={TrendingUp} title="Compliance %">
+                <LineChart
+                    title="Compliance %"
+                    runTrends={runTrends}
+                    series={[{ label: 'Compliant %', color: 'var(--green-9)', key: 'compliance', value: compliancePercent }]}
+                />
+            </ChartCard>
+            <ChartCard icon={Users} title="Headcount">
+                <LineChart
+                    title="Headcount"
+                    runTrends={runTrends}
+                    series={[{ label: 'Employees', color: 'var(--accent-9)', key: 'headcount', value: (p) => p.employees }]}
+                />
+            </ChartCard>
+            <ChartCard icon={AlertTriangle} title="Findings">
+                <LineChart
+                    title="Findings"
+                    runTrends={runTrends}
+                    series={[
+                        { label: 'Errors', color: 'var(--red-9)', key: 'findings', value: (p) => p.errorCount },
+                        { label: 'Warnings', color: 'var(--amber-9)', key: 'findings', value: (p) => p.warningCount },
+                    ]}
+                />
+            </ChartCard>
+        </Grid>
     );
 }
