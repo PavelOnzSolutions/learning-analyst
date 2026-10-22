@@ -83,7 +83,7 @@ const HistoryPage = () => {
                                     className="cursor-pointer hover:bg-(--accent-2)"
                                     onClick={() => navigate(`/history/${run.id}`)}
                                 >
-                                    <Table.Cell>{run.name}</Table.Cell>
+                                    <Table.Cell><Text weight="bold" size="2">{run.name}</Text></Table.Cell>
                                     <Table.Cell>{new Date(run.createdAt).toLocaleDateString()}</Table.Cell>
                                     <Table.Cell>{run.counts.employees}</Table.Cell>
                                     <Table.Cell>{run.counts.trainingCatalogEntries}</Table.Cell>
