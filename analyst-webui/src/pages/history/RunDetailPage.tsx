@@ -11,7 +11,7 @@ import {
     History,
     ShieldCheck,
     Timer,
-    User2
+    User2, UserCheck, UserRoundPlus
 } from 'lucide-react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
@@ -171,135 +171,167 @@ export default function RunDetailPage() {
             <Grid columns={{initial: '1', lg: '2'}} gap="4" mb="6">
                 <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
                     <Flex direction="column" gap="3">
-                        <Heading size="4" className="flex items-center gap-2">
-                            <ShieldCheck size={18} className="text-(--accent-9)"/> Compliance by Department
-                        </Heading>
+                        <Flex align="center" gap="2">
+                            <UserCheck size={16} className="text-(--accent-9)"/>
+                            <Text size="1" weight="medium" color="gray" className="uppercase tracking-wide">
+                                Compliance by Department
+                            </Text>
+                        </Flex>
+
                         <Separator size="4"/>
                         <ComplianceByDepartmentChart records={detail.compliance}/>
                     </Flex>
                 </Card>
+
                 <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
                     <Flex direction="column" gap="3">
-                        <Heading size="4" className="flex items-center gap-2">
-                            <Clock size={18} className="text-(--accent-9)"/> Upcoming Expirations
-                        </Heading>
-                        <Separator size="4"/>
+                        <Flex align="center" gap="2">
+                            <Clock size={16} className="text-(--accent-9)"/>
+                            <Text size="1" weight="medium" color="gray" className="uppercase tracking-wide">
+                                Upcoming Expirations
+                            </Text>
+                        </Flex>
                         <UpcomingExpirationsChart records={detail.compliance}/>
                     </Flex>
                 </Card>
+
                 <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
                     <Flex direction="column" gap="3">
-                        <Heading size="4" className="flex items-center gap-2">
-                            <CalendarRange size={18} className="text-(--accent-9)"/> Timeslot Capacity Utilization
-                        </Heading>
+                        <Flex align="center" gap="2">
+                            <CalendarRange size={16} className="text-(--accent-9)"/>
+                            <Text size="1" weight="medium" color="gray" className="uppercase tracking-wide">
+                                Timeslot Capacity Utilization
+                            </Text>
+                        </Flex>
                         <Separator size="4"/>
                         <TimeslotCapacityChart timeslots={detail.timeslots}/>
                     </Flex>
                 </Card>
+
                 <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
                     <Flex direction="column" gap="3">
-                        <Heading size="4" className="flex items-center gap-2">
-                            <Building2 size={18} className="text-(--accent-9)"/> Org Structure & Headcount
-                        </Heading>
+                        <Flex align="center" gap="2">
+                            <Building2 size={16} className="text-(--accent-9)"/>
+                            <Text size="1" weight="medium" color="gray" className="uppercase tracking-wide">
+                                Org Structure & Headcount
+                            </Text>
+                        </Flex>
                         <Separator size="4"/>
                         <OrgHeadcountChart employees={detail.employees}/>
                     </Flex>
                 </Card>
+
                 <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
                     <Flex direction="column" gap="3">
-                        <Heading size="4" className="flex items-center gap-2">
-                            <Coins size={18} className="text-(--accent-9)"/> Training Cost by Department
-                        </Heading>
+                        <Flex align="center" gap="2">
+                            <Coins size={16} className="text-(--accent-9)"/>
+                            <Text size="1" weight="medium" color="gray" className="uppercase tracking-wide">
+                                Training Cost by Department
+                            </Text>
+                        </Flex>
                         <Separator size="4"/>
                         <TrainingCostByDepartmentChart records={detail.compliance}/>
                     </Flex>
                 </Card>
             </Grid>
 
-            <Flex direction="column" gap="2" mb="4">
-                <Text size="4" weight="bold">Employees Requiring Mandatory Training</Text>
-                <Select.Root value={statusFilter}
-                             onValueChange={(value) => handleStatusFilterChange(value as 'ALL' | ComplianceStatus)}>
-                    <Select.Trigger/>
-                    <Select.Content>
-                        {STATUS_FILTER_OPTIONS.map((opt) => (
-                            <Select.Item key={opt.value} value={opt.value}>{opt.label}</Select.Item>
-                        ))}
-                    </Select.Content>
-                </Select.Root>
-            </Flex>
-            <Flex direction="column" gap="4">
-            <Table.Root variant="surface">
-                <Table.Header>
-                    <Table.Row>
-                        <Table.ColumnHeaderCell>Employee</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Department</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Position</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Training</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Expiry</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Cost</Table.ColumnHeaderCell>
-                    </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                    {pagedCompliance.map((record, index) => (
-                        <Table.Row key={index}>
-                            <Table.Cell>{record.employeeName}</Table.Cell>
-                            <Table.Cell>{record.utvar}</Table.Cell>
-                            <Table.Cell>{record.pozice}</Table.Cell>
-                            <Table.Cell>{record.kodSkoleni}</Table.Cell>
-                            <Table.Cell><Badge
-                                color={STATUS_BADGE_COLOR[record.status]}>{STATUS_LABEL[record.status]}</Badge></Table.Cell>
-                            <Table.Cell>{record.expiryDate ? new Date(record.expiryDate).toLocaleDateString() : '—'}</Table.Cell>
-                            <Table.Cell>{formatCost(record.costKc)}</Table.Cell>
-                        </Table.Row>
-                    ))}
-                </Table.Body>
-            </Table.Root>
+            <Card size="3">
+                <Flex direction="column" gap="3" height="100%">
+                    <Flex direction="column" gap="2" mb="4">
+                        <Flex align="center" gap="2">
+                            <UserRoundPlus size={16} className="text-(--accent-9)"/>
+                            <Text size="1" weight="medium" color="gray" className="uppercase tracking-wide">
+                                Employees Requiring Mandatory Training
+                            </Text>
+                        </Flex>
+                        <Select.Root value={statusFilter}
+                                     onValueChange={(value) => handleStatusFilterChange(value as 'ALL' | ComplianceStatus)}>
+                            <Select.Trigger/>
+                            <Select.Content>
+                                {STATUS_FILTER_OPTIONS.map((opt) => (
+                                    <Select.Item key={opt.value} value={opt.value}>{opt.label}</Select.Item>
+                                ))}
+                            </Select.Content>
+                        </Select.Root>
+                    </Flex>
+                    <Flex direction="column" gap="4">
+                        <Table.Root variant="surface">
+                            <Table.Header>
+                                <Table.Row>
+                                    <Table.ColumnHeaderCell>Employee</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Department</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Position</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Training</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Expiry</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Cost</Table.ColumnHeaderCell>
+                                </Table.Row>
+                            </Table.Header>
+                            <Table.Body>
+                                {pagedCompliance.map((record, index) => (
+                                    <Table.Row key={index}>
+                                        <Table.Cell>{record.employeeName}</Table.Cell>
+                                        <Table.Cell>{record.utvar}</Table.Cell>
+                                        <Table.Cell>{record.pozice}</Table.Cell>
+                                        <Table.Cell>{record.kodSkoleni}</Table.Cell>
+                                        <Table.Cell><Badge
+                                            color={STATUS_BADGE_COLOR[record.status]}>{STATUS_LABEL[record.status]}</Badge></Table.Cell>
+                                        <Table.Cell>{record.expiryDate ? new Date(record.expiryDate).toLocaleDateString() : '—'}</Table.Cell>
+                                        <Table.Cell>{formatCost(record.costKc)}</Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table.Root>
 
-            <PaginationControls
-                page={page}
-                totalPages={complianceTotalPages}
-                pageSize={pageSize}
-                onPageChange={setPage}
-                onPageSizeChange={handlePageSizeChange}
-            />
+                        <PaginationControls
+                            page={page}
+                            totalPages={complianceTotalPages}
+                            pageSize={pageSize}
+                            onPageChange={setPage}
+                            onPageSizeChange={handlePageSizeChange}
+                        />
+                        <Flex align="center" gap="2">
+                            <Timer size={16} className="text-(--accent-9)"/>
+                            <Text size="1" weight="medium" color="gray" className="uppercase tracking-wide">
+                                Scheduling Opportunities
+                            </Text>
+                        </Flex>
+                        <Table.Root variant="surface">
+                            <Table.Header>
+                                <Table.Row>
+                                    <Table.ColumnHeaderCell>Employee</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Training</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Upcoming Timeslot</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Capacity</Table.ColumnHeaderCell>
+                                    <Table.ColumnHeaderCell>Cost / Person</Table.ColumnHeaderCell>
+                                </Table.Row>
+                            </Table.Header>
+                            <Table.Body>
+                                {pagedOpportunities.map((opportunity, index) => (
+                                    <Table.Row key={index}>
+                                        <Table.Cell>{opportunity.employeeName}</Table.Cell>
+                                        <Table.Cell>{opportunity.kodSkoleni}</Table.Cell>
+                                        <Table.Cell><Badge
+                                            color={STATUS_BADGE_COLOR[opportunity.status]}>{STATUS_LABEL[opportunity.status]}</Badge></Table.Cell>
+                                        <Table.Cell>{opportunity.datum ? new Date(opportunity.datum).toLocaleDateString() : '—'}</Table.Cell>
+                                        <Table.Cell>{opportunity.obsazeno} / {opportunity.kapacita}</Table.Cell>
+                                        <Table.Cell>{formatCost(opportunity.costPerPerson)}</Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table.Root>
 
-            <Text size="4" weight="bold" mb="2" mt="6">Scheduling Opportunities</Text>
-            <Table.Root variant="surface">
-                <Table.Header>
-                    <Table.Row>
-                        <Table.ColumnHeaderCell>Employee</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Training</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Upcoming Timeslot</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Capacity</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell>Cost / Person</Table.ColumnHeaderCell>
-                    </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                    {pagedOpportunities.map((opportunity, index) => (
-                        <Table.Row key={index}>
-                            <Table.Cell>{opportunity.employeeName}</Table.Cell>
-                            <Table.Cell>{opportunity.kodSkoleni}</Table.Cell>
-                            <Table.Cell><Badge
-                                color={STATUS_BADGE_COLOR[opportunity.status]}>{STATUS_LABEL[opportunity.status]}</Badge></Table.Cell>
-                            <Table.Cell>{opportunity.datum ? new Date(opportunity.datum).toLocaleDateString() : '—'}</Table.Cell>
-                            <Table.Cell>{opportunity.obsazeno} / {opportunity.kapacita}</Table.Cell>
-                            <Table.Cell>{formatCost(opportunity.costPerPerson)}</Table.Cell>
-                        </Table.Row>
-                    ))}
-                </Table.Body>
-            </Table.Root>
-
-            <PaginationControls
-                page={opportunitiesPage}
-                totalPages={opportunitiesTotalPages}
-                pageSize={opportunitiesPageSize}
-                onPageChange={setOpportunitiesPage}
-                onPageSizeChange={handleOpportunitiesPageSizeChange}
-            />
-            </Flex>
+                        <PaginationControls
+                            page={opportunitiesPage}
+                            totalPages={opportunitiesTotalPages}
+                            pageSize={opportunitiesPageSize}
+                            onPageChange={setOpportunitiesPage}
+                            onPageSizeChange={handleOpportunitiesPageSizeChange}
+                        />
+                    </Flex>
+                </Flex>
+            </Card>
         </Card>
     );
 }

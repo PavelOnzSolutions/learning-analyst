@@ -1,6 +1,6 @@
 import {useState} from 'react';
-import {Badge, Card, Flex, Progress, Select, Skeleton, Table, Text} from '@radix-ui/themes';
-import {ChartNetwork, ClockCheck, LineChart, RefreshCcw, UserCheck, UserCheck2, Users2} from 'lucide-react';
+import {Badge, Card, Flex, Progress, Select, Table, Text} from '@radix-ui/themes';
+import {ChartNetwork, ClockCheck, LineChart, RefreshCcw, UserCheck} from 'lucide-react';
 import {useQuery} from '@tanstack/react-query';
 import PageHeader from '../../components/layout/PageHeader';
 import {usePageTitle} from '../../context/PageTitleContext';
@@ -71,7 +71,7 @@ const InsightsPage = () => {
         refetch: refetchEmployees,
         isLoading: employeesLoading
     } = useQuery({queryKey: ['insights', 'employees'], queryFn: fetchEmployees});
-    const {data: history, refetch: refetchEmployeeHistory, isLoading: historyLoading} = useQuery({
+    const {data: history, refetch: refetchEmployeeHistory} = useQuery({
         queryKey: ['insights', 'employee-history', selectedEmployeeId],
         queryFn: () => fetchEmployeeHistory(selectedEmployeeId as string),
         enabled: !!selectedEmployeeId,
@@ -79,7 +79,6 @@ const InsightsPage = () => {
     const {
         data: schedulingSuggestions,
         refetch: refetchSchedulingSuggestions,
-        isLoading: schedulingSuggestionsLoading
     } = useQuery({
         queryKey: ['insights', 'scheduling-suggestions'],
         queryFn: fetchSchedulingSuggestions,
