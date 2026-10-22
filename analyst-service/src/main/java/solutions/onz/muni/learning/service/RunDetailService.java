@@ -75,7 +75,8 @@ public class RunDetailService {
                 }
                 opportunities.add(new SchedulingOpportunity(
                         record.idZamestnance(), record.employeeName(), record.kodSkoleni(), record.nazevSkoleni(),
-                        record.status(), slot.getIdTerminu(), slot.getDatum(), slot.getKapacita(), slot.getObsazeno()));
+                        record.status(), slot.getIdTerminu(), slot.getDatum(), slot.getKapacita(), slot.getObsazeno(),
+                        slot.getCenaNaOsobu()));
             }
         }
 

@@ -134,6 +134,7 @@ class TrainingComplianceServiceTest {
         RunTrainingCatalogEntry mandatory = catalogEntry("BOZP-Z", 24, "VSICHNI");
         RunTrainingCatalogEntry optional = catalogEntry("ANGL", null, "NEPOVINNE");
         RunCompletedTraining completion = completed("E1", "BOZP-Z", LocalDate.of(2025, 1, 1), LocalDate.of(2027, 1, 1));
+        completion.setCenaKc(new java.math.BigDecimal("450"));
 
         List<ComplianceRecord> records = service.computeDetail(
                 List.of(active, terminated), List.of(mandatory, optional), List.of(completion), asOf);
@@ -144,6 +145,7 @@ class TrainingComplianceServiceTest {
         assertThat(record.kodSkoleni()).isEqualTo("BOZP-Z");
         assertThat(record.status()).isEqualTo(ComplianceStatus.COMPLIANT);
         assertThat(record.expiryDate()).isEqualTo(LocalDate.of(2027, 1, 1));
+        assertThat(record.costKc()).isEqualTo(new java.math.BigDecimal("450"));
     }
 
     @Test
@@ -163,6 +165,7 @@ class TrainingComplianceServiceTest {
         ComplianceRecord neverCompletedRecord = records.stream().filter(r -> r.kodSkoleni().equals("GDPR")).findFirst().orElseThrow();
         assertThat(neverCompletedRecord.status()).isEqualTo(ComplianceStatus.OVERDUE);
         assertThat(neverCompletedRecord.expiryDate()).isNull();
+        assertThat(neverCompletedRecord.costKc()).isNull();
     }
 
     @Test

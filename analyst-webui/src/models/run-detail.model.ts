@@ -17,6 +17,7 @@ export interface ITimeslotSummary {
     kapacita: number | null;
     obsazeno: number | null;
     stav: string | null;
+    costPerPerson: number | null;
 }
 
 export interface IComplianceRecord {
@@ -28,6 +29,7 @@ export interface IComplianceRecord {
     nazevSkoleni: string | null;
     status: ComplianceStatus;
     expiryDate: string | null;
+    costKc: number | null;
 }
 
 export interface ISchedulingOpportunity {
@@ -40,6 +42,7 @@ export interface ISchedulingOpportunity {
     datum: string | null;
     kapacita: number | null;
     obsazeno: number | null;
+    costPerPerson: number | null;
 }
 
 export interface IRunDetailResponse {

@@ -6,7 +6,7 @@ import type { IComplianceRecord } from '../../../models/run-detail.model';
 function record(overrides: Partial<IComplianceRecord>): IComplianceRecord {
     return {
         idZamestnance: 'E1', employeeName: 'Test', utvar: 'Lab', pozice: 'Tech',
-        kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Training', status: 'OVERDUE', expiryDate: null,
+        kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Training', status: 'OVERDUE', expiryDate: null, costKc: null,
         ...overrides,
     };
 }

@@ -19,6 +19,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 // @ts-ignore
 import './App.css';
 import Metrics from "./pages/admin/metrics/Metrics.tsx";
+import About from "./pages/documentation/About.tsx";
 
 const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -57,6 +58,8 @@ function App() {
                 <Route path="/admin/metrics" element={<Metrics />} />
 
                 <Route path="/profile" element={<UserProfile />} />
+
+                <Route path="/documentation/about" element={<About />} />
               </Route>
             </Route>
 

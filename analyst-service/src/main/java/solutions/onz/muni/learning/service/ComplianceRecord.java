@@ -2,6 +2,7 @@ package solutions.onz.muni.learning.service;
 
 import solutions.onz.muni.learning.domain.enums.ComplianceStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ComplianceRecord(
@@ -12,6 +13,7 @@ public record ComplianceRecord(
         String kodSkoleni,
         String nazevSkoleni,
         ComplianceStatus status,
-        LocalDate expiryDate
+        LocalDate expiryDate,
+        BigDecimal costKc
 ) {
 }

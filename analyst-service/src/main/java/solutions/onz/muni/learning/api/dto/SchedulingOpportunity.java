@@ -2,6 +2,7 @@ package solutions.onz.muni.learning.api.dto;
 
 import solutions.onz.muni.learning.domain.enums.ComplianceStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record SchedulingOpportunity(
@@ -13,6 +14,7 @@ public record SchedulingOpportunity(
         String idTerminu,
         LocalDate datum,
         Integer kapacita,
-        Integer obsazeno
+        Integer obsazeno,
+        BigDecimal costPerPerson
 ) {
 }

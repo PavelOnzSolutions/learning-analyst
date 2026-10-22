@@ -23,6 +23,7 @@ import solutions.onz.muni.learning.repository.RunCompletedTrainingRepository;
 import solutions.onz.muni.learning.repository.RunEmployeeRepository;
 import solutions.onz.muni.learning.repository.RunTrainingCatalogEntryRepository;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -177,7 +178,7 @@ class InsightsServiceTest {
         when(importRunRepository.findFirstByStatusOrderByCreatedAtDesc(RunStatus.COMPLETED)).thenReturn(java.util.Optional.of(latest));
 
         SchedulingOpportunity opportunity = new SchedulingOpportunity("E1", "Tereza Urbanová", "BOZP-Z", "Základní školení",
-                ComplianceStatus.OVERDUE, "T1", LocalDate.of(2026, 11, 1), 10, 5);
+                ComplianceStatus.OVERDUE, "T1", LocalDate.of(2026, 11, 1), 10, 5, new BigDecimal("450"));
         RunDetailResponse detail = new RunDetailResponse(List.of(), List.of(), List.of(), List.of(opportunity));
         when(runDetailService.getDetail("r2")).thenReturn(detail);
 

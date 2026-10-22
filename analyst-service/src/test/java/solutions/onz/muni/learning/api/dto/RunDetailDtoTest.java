@@ -52,5 +52,6 @@ class RunDetailDtoTest {
         assertThat(summary.kapacita()).isEqualTo(25);
         assertThat(summary.obsazeno()).isEqualTo(22);
         assertThat(summary.stav()).isEqualTo("plánováno");
+        assertThat(summary.costPerPerson()).isEqualTo(new BigDecimal("450"));
     }
 }

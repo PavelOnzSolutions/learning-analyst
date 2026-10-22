@@ -3,7 +3,7 @@ Imports and analyzes trends and indicators within the exported CSV data
 
 ### Build status
 [![LA - WebApp](https://github.com/PavelOnzSolutions/learning-analyst/actions/workflows/azure-static-web-apps-witty-plant-0e3e52103.yml/badge.svg)](https://github.com/PavelOnzSolutions/learning-analyst/actions/workflows/azure-static-web-apps-witty-plant-0e3e52103.yml)
-[![LA - service](https://github.com/PavelOnzSolutions/learning-analyst/actions/workflows/main_app-learning-analyst-we.yml/badge.svg)](https://github.com/PavelOnzSolutions/learning-analyst/actions/workflows/main_app-learning-analyst-we.yml)
+[![LA - Service](https://github.com/PavelOnzSolutions/learning-analyst/actions/workflows/main_app-learning-analyst-we.yml/badge.svg)](https://github.com/PavelOnzSolutions/learning-analyst/actions/workflows/main_app-learning-analyst-we.yml)
 
 ### Description
 
