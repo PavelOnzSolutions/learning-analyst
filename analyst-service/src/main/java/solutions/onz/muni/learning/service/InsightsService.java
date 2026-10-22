@@ -20,12 +20,14 @@ import solutions.onz.muni.learning.repository.RunCompletedTrainingRepository;
 import solutions.onz.muni.learning.repository.RunEmployeeRepository;
 import solutions.onz.muni.learning.repository.RunTrainingCatalogEntryRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +42,24 @@ public class InsightsService {
 
     public InsightsOverviewResponse getOverview() {
         List<RunTrendPoint> runTrends = completedRunsChronological().stream()
-                .map(RunTrendPoint::from)
+                .map(this::buildRunTrendPoint)
                 .toList();
         return new InsightsOverviewResponse(runTrends);
+    }
+
+    private RunTrendPoint buildRunTrendPoint(ImportRun run) {
+        List<RunEmployee> employees = runEmployeeRepository.findByRunId(run.getId());
+        List<RunTrainingCatalogEntry> catalog = runTrainingCatalogEntryRepository.findByRunId(run.getId());
+        List<RunCompletedTraining> completedTrainings = runCompletedTrainingRepository.findByRunId(run.getId());
+        LocalDate asOf = run.getConfirmedAt().atZone(ZoneOffset.UTC).toLocalDate();
+
+        List<ComplianceRecord> records = trainingComplianceService.computeDetail(employees, catalog, completedTrainings, asOf);
+        BigDecimal totalCostKc = records.stream()
+                .map(ComplianceRecord::costKc)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return RunTrendPoint.from(run, totalCostKc);
     }
 
     public List<EmployeeOption> listEmployees() {

@@ -6,6 +6,7 @@ import {
     CalendarRange,
     CircleCheck,
     Clock,
+    Coins,
     GraduationCap,
     History,
     ShieldCheck,
@@ -26,6 +27,7 @@ import ComplianceByDepartmentChart from '../../components/charts/ComplianceByDep
 import UpcomingExpirationsChart from '../../components/charts/UpcomingExpirationsChart';
 import TimeslotCapacityChart from '../../components/charts/TimeslotCapacityChart';
 import OrgHeadcountChart from '../../components/charts/OrgHeadcountChart';
+import TrainingCostByDepartmentChart from '../../components/charts/TrainingCostByDepartmentChart';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -201,6 +203,15 @@ export default function RunDetailPage() {
                         </Heading>
                         <Separator size="4"/>
                         <OrgHeadcountChart employees={detail.employees}/>
+                    </Flex>
+                </Card>
+                <Card size="3" className="glass-card" style={{background: 'var(--glass-bg)'}}>
+                    <Flex direction="column" gap="3">
+                        <Heading size="4" className="flex items-center gap-2">
+                            <Coins size={18} className="text-(--accent-9)"/> Training Cost by Department
+                        </Heading>
+                        <Separator size="4"/>
+                        <TrainingCostByDepartmentChart records={detail.compliance}/>
                     </Flex>
                 </Card>
             </Grid>

@@ -95,6 +95,33 @@ class InsightsServiceTest {
         assertThat(overview.runTrends().get(0).employees()).isEqualTo(10);
         assertThat(overview.runTrends().get(0).compliantCount()).isEqualTo(7);
         assertThat(overview.runTrends().get(0).overdueCount()).isEqualTo(2);
+        assertThat(overview.runTrends().get(0).totalCostKc()).isEqualTo(BigDecimal.ZERO);
+    }
+
+    @Test
+    void getOverviewSumsCostAcrossAllEmployeesAndTrainingsForTheRun() {
+        when(importRunRepository.findByStatusOrderByCreatedAtAsc(RunStatus.COMPLETED))
+                .thenReturn(List.of(run("r1", "October import", Instant.parse("2026-10-01T00:00:00Z"), new Counts(2, 1, 0, 0, 0, 0, 0, 0, 0))));
+        when(runEmployeeRepository.findByRunId("r1")).thenReturn(List.of(
+                employee("E1", "Tereza", "Urbanová"), employee("E2", "Jan", "Novák")));
+        RunTrainingCatalogEntry entry = catalogEntry("BOZP-Z", 24);
+        when(runTrainingCatalogEntryRepository.findByRunId("r1")).thenReturn(List.of(entry));
+
+        RunCompletedTraining completion1 = new RunCompletedTraining();
+        completion1.setIdZamestnance("E1");
+        completion1.setKodSkoleni("BOZP-Z");
+        completion1.setDatumAbsolvovani(LocalDate.of(2026, 1, 1));
+        completion1.setCenaKc(new BigDecimal("450"));
+        RunCompletedTraining completion2 = new RunCompletedTraining();
+        completion2.setIdZamestnance("E2");
+        completion2.setKodSkoleni("BOZP-Z");
+        completion2.setDatumAbsolvovani(LocalDate.of(2026, 1, 1));
+        completion2.setCenaKc(new BigDecimal("300"));
+        when(runCompletedTrainingRepository.findByRunId("r1")).thenReturn(List.of(completion1, completion2));
+
+        InsightsOverviewResponse overview = insightsService.getOverview();
+
+        assertThat(overview.runTrends().get(0).totalCostKc()).isEqualTo(new BigDecimal("750"));
     }
 
     @Test
