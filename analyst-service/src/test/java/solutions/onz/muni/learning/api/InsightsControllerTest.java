@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import solutions.onz.muni.learning.api.dto.EmployeeHistoryResponse;
 import solutions.onz.muni.learning.api.dto.EmployeeOption;
 import solutions.onz.muni.learning.api.dto.InsightsOverviewResponse;
+import solutions.onz.muni.learning.api.dto.SchedulingSuggestionsResponse;
 import solutions.onz.muni.learning.repository.AppUserRepository;
 import solutions.onz.muni.learning.service.InsightsService;
 
@@ -77,6 +78,15 @@ class InsightsControllerTest {
                 .thenReturn(new EmployeeHistoryResponse("E1", "Tereza Urbanová", List.of()));
 
         mockMvc.perform(get("/api/v1/insights/employees/E1/history").with(asUser()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void schedulingSuggestionsReturnsDataForAuthenticatedUser() throws Exception {
+        when(insightsService.getSchedulingSuggestions())
+                .thenReturn(new SchedulingSuggestionsResponse(null, null, List.of()));
+
+        mockMvc.perform(get("/api/v1/insights/scheduling-suggestions").with(asUser()))
                 .andExpect(status().isOk());
     }
 }

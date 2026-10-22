@@ -5,7 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import solutions.onz.muni.learning.api.dto.EmployeeHistoryResponse;
 import solutions.onz.muni.learning.api.dto.EmployeeOption;
+import solutions.onz.muni.learning.api.dto.EmployeeSummary;
 import solutions.onz.muni.learning.api.dto.InsightsOverviewResponse;
+import solutions.onz.muni.learning.api.dto.RunDetailResponse;
+import solutions.onz.muni.learning.api.dto.SchedulingOpportunity;
+import solutions.onz.muni.learning.api.dto.SchedulingSuggestionsResponse;
+import solutions.onz.muni.learning.api.dto.TimeslotSummary;
 import solutions.onz.muni.learning.domain.Counts;
 import solutions.onz.muni.learning.domain.ImportRun;
 import solutions.onz.muni.learning.domain.RunCompletedTraining;
@@ -33,10 +38,11 @@ class InsightsServiceTest {
     private final RunTrainingCatalogEntryRepository runTrainingCatalogEntryRepository = Mockito.mock(RunTrainingCatalogEntryRepository.class);
     private final RunCompletedTrainingRepository runCompletedTrainingRepository = Mockito.mock(RunCompletedTrainingRepository.class);
     private final TrainingComplianceService trainingComplianceService = new TrainingComplianceService();
+    private final RunDetailService runDetailService = Mockito.mock(RunDetailService.class);
 
     private final InsightsService insightsService = new InsightsService(
             importRunRepository, runEmployeeRepository, runTrainingCatalogEntryRepository,
-            runCompletedTrainingRepository, trainingComplianceService);
+            runCompletedTrainingRepository, trainingComplianceService, runDetailService);
 
     private ImportRun run(String id, String name, Instant confirmedAt, Counts counts) {
         ImportRun run = new ImportRun();
@@ -162,5 +168,34 @@ class InsightsServiceTest {
 
         assertThatThrownBy(() -> insightsService.getEmployeeHistory("unknown"))
                 .isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
+    }
+
+    @Test
+    void getSchedulingSuggestionsDelegatesToRunDetailServiceForTheMostRecentlyConfirmedRun() {
+        ImportRun older = run("r1", "Older run", Instant.parse("2026-09-01T00:00:00Z"), new Counts(1, 0, 0, 0, 0, 0, 0, 0, 0));
+        ImportRun latest = run("r2", "Latest run", Instant.parse("2026-10-01T00:00:00Z"), new Counts(1, 0, 0, 0, 0, 0, 0, 0, 0));
+        when(importRunRepository.findFirstByStatusOrderByCreatedAtDesc(RunStatus.COMPLETED)).thenReturn(java.util.Optional.of(latest));
+
+        SchedulingOpportunity opportunity = new SchedulingOpportunity("E1", "Tereza Urbanová", "BOZP-Z", "Základní školení",
+                ComplianceStatus.OVERDUE, "T1", LocalDate.of(2026, 11, 1), 10, 5);
+        RunDetailResponse detail = new RunDetailResponse(List.of(), List.of(), List.of(), List.of(opportunity));
+        when(runDetailService.getDetail("r2")).thenReturn(detail);
+
+        SchedulingSuggestionsResponse response = insightsService.getSchedulingSuggestions();
+
+        assertThat(response.basedOnRunId()).isEqualTo("r2");
+        assertThat(response.basedOnRunName()).isEqualTo("Latest run");
+        assertThat(response.suggestions()).hasSize(1);
+        assertThat(response.suggestions().get(0).idZamestnance()).isEqualTo("E1");
+    }
+
+    @Test
+    void getSchedulingSuggestionsReturnsEmptyWhenThereIsNoCompletedRunYet() {
+        when(importRunRepository.findFirstByStatusOrderByCreatedAtDesc(RunStatus.COMPLETED)).thenReturn(java.util.Optional.empty());
+
+        SchedulingSuggestionsResponse response = insightsService.getSchedulingSuggestions();
+
+        assertThat(response.basedOnRunId()).isNull();
+        assertThat(response.suggestions()).isEmpty();
     }
 }

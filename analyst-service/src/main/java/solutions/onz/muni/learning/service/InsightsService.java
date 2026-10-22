@@ -9,6 +9,7 @@ import solutions.onz.muni.learning.api.dto.EmployeeHistoryResponse;
 import solutions.onz.muni.learning.api.dto.EmployeeOption;
 import solutions.onz.muni.learning.api.dto.InsightsOverviewResponse;
 import solutions.onz.muni.learning.api.dto.RunTrendPoint;
+import solutions.onz.muni.learning.api.dto.SchedulingSuggestionsResponse;
 import solutions.onz.muni.learning.domain.ImportRun;
 import solutions.onz.muni.learning.domain.RunCompletedTraining;
 import solutions.onz.muni.learning.domain.RunEmployee;
@@ -35,6 +36,7 @@ public class InsightsService {
     private final RunTrainingCatalogEntryRepository runTrainingCatalogEntryRepository;
     private final RunCompletedTrainingRepository runCompletedTrainingRepository;
     private final TrainingComplianceService trainingComplianceService;
+    private final RunDetailService runDetailService;
 
     public InsightsOverviewResponse getOverview() {
         List<RunTrendPoint> runTrends = completedRunsChronological().stream()
@@ -89,6 +91,13 @@ public class InsightsService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found in any completed run");
         }
         return new EmployeeHistoryResponse(idZamestnance, employeeName, history);
+    }
+
+    public SchedulingSuggestionsResponse getSchedulingSuggestions() {
+        return importRunRepository.findFirstByStatusOrderByCreatedAtDesc(RunStatus.COMPLETED)
+                .map(run -> new SchedulingSuggestionsResponse(
+                        run.getId(), run.getName(), runDetailService.getDetail(run.getId()).schedulingOpportunities()))
+                .orElse(new SchedulingSuggestionsResponse(null, null, List.of()));
     }
 
     private List<ImportRun> completedRunsChronological() {

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import solutions.onz.muni.learning.api.dto.EmployeeHistoryResponse;
 import solutions.onz.muni.learning.api.dto.EmployeeOption;
 import solutions.onz.muni.learning.api.dto.InsightsOverviewResponse;
+import solutions.onz.muni.learning.api.dto.SchedulingSuggestionsResponse;
 import solutions.onz.muni.learning.service.InsightsService;
 
 import java.util.List;
@@ -43,5 +44,12 @@ public class InsightsController {
     @GetMapping("/employees/{idZamestnance}/history")
     public EmployeeHistoryResponse employeeHistory(@PathVariable String idZamestnance) {
         return insightsService.getEmployeeHistory(idZamestnance);
+    }
+
+    @Operation(summary = "Get scheduling suggestions", description = "Returns (employee, upcoming timeslot) matches from the most recently confirmed run, for employees who are overdue or expiring and have an open-seat timeslot available")
+    @ApiResponse(responseCode = "200", description = "Suggestions returned")
+    @GetMapping("/scheduling-suggestions")
+    public SchedulingSuggestionsResponse schedulingSuggestions() {
+        return insightsService.getSchedulingSuggestions();
     }
 }
