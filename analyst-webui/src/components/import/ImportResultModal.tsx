@@ -80,7 +80,7 @@ export default function ImportResultModal({ run, open, onOpenChange, onConfirmed
         <>
             <Dialog.Root open={open} onOpenChange={onOpenChange}>
                 <Dialog.Content
-                    style={{ maxWidth: 700 }}
+                    style={{ maxWidth: 800, maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}
                     onEscapeKeyDown={(e) => e.preventDefault()}
                     onPointerDownOutside={(e) => e.preventDefault()}
                 >
@@ -99,35 +99,37 @@ export default function ImportResultModal({ run, open, onOpenChange, onConfirmed
                     </Flex>
 
                     {run.findings.length > 0 ? (
-                        <Table.Root variant="surface">
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.ColumnHeaderCell>Severity</Table.ColumnHeaderCell>
-                                    <Table.ColumnHeaderCell>File</Table.ColumnHeaderCell>
-                                    <Table.ColumnHeaderCell>Row</Table.ColumnHeaderCell>
-                                    <Table.ColumnHeaderCell>Field</Table.ColumnHeaderCell>
-                                    <Table.ColumnHeaderCell>Message</Table.ColumnHeaderCell>
-                                </Table.Row>
-                            </Table.Header>
-                            <Table.Body>
-                                {run.findings.map((finding, index) => (
-                                    <Table.Row key={index}>
-                                        <Table.Cell>
-                                            <Badge color={finding.severity === 'ERROR' ? 'red' : 'amber'}>{finding.severity}</Badge>
-                                        </Table.Cell>
-                                        <Table.Cell>{FILE_ROLE_LABELS[finding.file]}</Table.Cell>
-                                        <Table.Cell>{finding.row === 0 ? 'File-level' : finding.row}</Table.Cell>
-                                        <Table.Cell>{finding.field || '-'}</Table.Cell>
-                                        <Table.Cell>{finding.message}</Table.Cell>
+                        <div style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
+                            <Table.Root variant="surface">
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.ColumnHeaderCell>Severity</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>File</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Row</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Field</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Message</Table.ColumnHeaderCell>
                                     </Table.Row>
-                                ))}
-                            </Table.Body>
-                        </Table.Root>
+                                </Table.Header>
+                                <Table.Body>
+                                    {run.findings.map((finding, index) => (
+                                        <Table.Row key={index}>
+                                            <Table.Cell>
+                                                <Badge color={finding.severity === 'ERROR' ? 'red' : 'amber'}>{finding.severity}</Badge>
+                                            </Table.Cell>
+                                            <Table.Cell>{FILE_ROLE_LABELS[finding.file]}</Table.Cell>
+                                            <Table.Cell>{finding.row === 0 ? 'File-level' : finding.row}</Table.Cell>
+                                            <Table.Cell>{finding.field || '-'}</Table.Cell>
+                                            <Table.Cell>{finding.message}</Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table.Root>
+                        </div>
                     ) : (
                         <Text size="2" color="gray">No findings — the data parsed cleanly.</Text>
                     )}
 
-                    <Flex gap="3" mt="4" justify="end">
+                    <Flex gap="3" mt="4" justify="end" flexShrink="0">
                         <Button
                             variant="solid"
                             color="red"
