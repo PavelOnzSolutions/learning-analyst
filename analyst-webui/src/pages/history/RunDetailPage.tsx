@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Badge, Card, Flex, Grid, Heading, Select, Separator, Table, Text, Progress} from '@radix-ui/themes';
+import {Badge, Card, Flex, Grid, Select, Separator, Table, Text, Progress} from '@radix-ui/themes';
 import {
     ArrowLeft,
     Building2,
@@ -9,7 +9,6 @@ import {
     Coins,
     GraduationCap,
     History,
-    ShieldCheck,
     Timer,
     User2, UserCheck, UserRoundPlus
 } from 'lucide-react';
