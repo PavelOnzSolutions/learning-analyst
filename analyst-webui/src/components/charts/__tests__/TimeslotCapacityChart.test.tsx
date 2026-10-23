@@ -5,7 +5,7 @@ import type { ITimeslotSummary } from '../../../models/run-detail.model';
 
 function timeslot(overrides: Partial<ITimeslotSummary>): ITimeslotSummary {
     return {
-        idTerminu: 'T1', kodSkoleni: 'BOZP-Z', datum: '2026-02-01', misto: 'Aula A',
+        idTerminu: 'T1', kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Základní školení BOZP', datum: '2026-02-01', misto: 'Aula A',
         kapacita: 10, obsazeno: 5, stav: 'plánováno', costPerPerson: null,
         ...overrides,
     };
@@ -57,5 +57,21 @@ describe('TimeslotCapacityChart', () => {
         render(<TimeslotCapacityChart timeslots={[]} asOf={ASOF} />);
 
         expect(screen.getByText(/No upcoming timeslots/i)).toBeInTheDocument();
+    });
+
+    it('includes the training name alongside time and occupancy for each timeslot', () => {
+        const timeslots = [
+            timeslot({ idTerminu: 'T1', nazevSkoleni: 'Základní školení BOZP', kodSkoleni: 'BOZP-Z' }),
+            timeslot({ idTerminu: 'T2', nazevSkoleni: null, kodSkoleni: 'FIRST-AID' }),
+        ];
+
+        const { container } = render(<TimeslotCapacityChart timeslots={timeslots} asOf={ASOF} />);
+
+        const withName = container.querySelector('rect[data-timeslot="T1"]');
+        expect(withName?.getAttribute('data-training')).toBe('Základní školení BOZP');
+        expect(withName?.querySelector('title')?.textContent).toContain('Základní školení BOZP');
+
+        const withoutName = container.querySelector('rect[data-timeslot="T2"]');
+        expect(withoutName?.getAttribute('data-training')).toBe('FIRST-AID');
     });
 });

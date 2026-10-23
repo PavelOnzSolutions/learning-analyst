@@ -116,6 +116,9 @@ class RunDetailServiceTest {
         assertThat(detail.compliance()).hasSize(1);
         assertThat(detail.compliance().get(0).status()).isEqualTo(ComplianceStatus.OVERDUE);
 
+        assertThat(detail.timeslots().get(0).nazevSkoleni()).isEqualTo("Training BOZP-Z");
+        assertThat(detail.timeslots().get(4).nazevSkoleni()).isNull();
+
         assertThat(detail.schedulingOpportunities()).hasSize(1);
         SchedulingOpportunity opportunity = detail.schedulingOpportunities().get(0);
         assertThat(opportunity.idZamestnance()).isEqualTo("E1");

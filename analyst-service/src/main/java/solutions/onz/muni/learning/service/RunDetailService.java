@@ -19,6 +19,8 @@ import solutions.onz.muni.learning.repository.RunTrainingCatalogEntryRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +47,15 @@ public class RunDetailService {
                 employees, catalog, completedTrainings, LocalDate.now());
         List<SchedulingOpportunity> schedulingOpportunities = buildSchedulingOpportunities(compliance, timeslots, LocalDate.now());
 
+        Map<String, String> trainingNamesByCode = catalog.stream()
+                .filter(entry -> entry.getKod() != null)
+                .collect(Collectors.toMap(RunTrainingCatalogEntry::getKod, RunTrainingCatalogEntry::getNazev, (first, second) -> first));
+
         return new RunDetailResponse(
                 employees.stream().map(EmployeeSummary::from).toList(),
-                timeslots.stream().map(TimeslotSummary::from).toList(),
+                timeslots.stream()
+                        .map(timeslot -> TimeslotSummary.from(timeslot, trainingNamesByCode.get(timeslot.getKodSkoleni())))
+                        .toList(),
                 compliance,
                 schedulingOpportunities);
     }

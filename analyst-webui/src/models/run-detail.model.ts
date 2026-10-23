@@ -12,6 +12,7 @@ export interface IEmployeeSummary {
 export interface ITimeslotSummary {
     idTerminu: string;
     kodSkoleni: string | null;
+    nazevSkoleni: string | null;
     datum: string | null;
     misto: string | null;
     kapacita: number | null;

@@ -43,10 +43,11 @@ class RunDetailDtoTest {
         timeslot.setCenaNaOsobu(new BigDecimal("450"));
         timeslot.setStav("plánováno");
 
-        TimeslotSummary summary = TimeslotSummary.from(timeslot);
+        TimeslotSummary summary = TimeslotSummary.from(timeslot, "Základní školení BOZP");
 
         assertThat(summary.idTerminu()).isEqualTo("T001");
         assertThat(summary.kodSkoleni()).isEqualTo("BOZP-Z");
+        assertThat(summary.nazevSkoleni()).isEqualTo("Základní školení BOZP");
         assertThat(summary.datum()).isEqualTo(LocalDate.of(2026, 11, 1));
         assertThat(summary.misto()).isEqualTo("Aula A");
         assertThat(summary.kapacita()).isEqualTo(25);

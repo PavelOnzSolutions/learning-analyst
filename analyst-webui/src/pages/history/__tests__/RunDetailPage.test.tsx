@@ -83,7 +83,7 @@ const detail = {
         { idZamestnance: 'E2', jmeno: 'Jan', prijmeni: 'Novák', utvar: 'Lab', pozice: 'Tech', stav: 'aktivní' },
     ],
     timeslots: [
-        { idTerminu: 'T1', kodSkoleni: 'BOZP-Z', datum: '2099-01-01', misto: 'Aula A', kapacita: 10, obsazeno: 5, stav: 'plánováno' },
+        { idTerminu: 'T1', kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Základní školení', datum: '2099-01-01', misto: 'Aula A', kapacita: 10, obsazeno: 5, stav: 'plánováno' },
     ],
     compliance: [
         { idZamestnance: 'E1', employeeName: 'Tereza Urbanová', utvar: 'Lab', pozice: 'Tech', kodSkoleni: 'BOZP-Z', nazevSkoleni: 'Základní školení', status: 'OVERDUE', expiryDate: null },
