@@ -8,9 +8,9 @@ interface Config {
 }
 
 const config: Config = {
-    apiBaseUrl: (import.meta.env.VITE_BASE_URL || 'https://api.skoleni.zkrabice.cz') + '/api',
-    baseUrl: (import.meta.env.VITE_BASE_URL || 'https://api.skoleni.zkrabice.cz'),
-    wsUrl: import.meta.env.VITE_WS_URL || 'https://api.skoleni.zkrabice.cz/ws',
+    apiBaseUrl: (import.meta.env.VITE_BASE_URL || 'http://localhost:8080') + '/api',
+    baseUrl: (import.meta.env.VITE_BASE_URL || 'http://localhost:8080'),
+    wsUrl: import.meta.env.VITE_WS_URL || 'http://localhost:8080/ws',
     brand: import.meta.env.VITE_BRAND || '',
     version: import.meta.env.VITE_VERSION || '1.0.0',
     prod: import.meta.env.VITE_PROD || false,
