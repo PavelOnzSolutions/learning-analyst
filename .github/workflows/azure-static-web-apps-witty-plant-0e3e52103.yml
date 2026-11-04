@@ -24,8 +24,8 @@ jobs:
       - name: Build web app
         working-directory: analyst-webui
         env:
-          VITE_BASE_URL: 'https://api.learning.zkrabice.cz'
-          VITE_WS_URL: 'https://api.learning.zkrabice.cz/ws'
+          VITE_BASE_URL: 'https://api.skoleni.zkrabice.cz'
+          VITE_WS_URL: 'https://api.skoleni.zkrabice.cz/ws'
           VITE_PROD: 'true'
         run: npm run build
         
