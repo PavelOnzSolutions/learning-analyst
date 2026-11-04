@@ -58,12 +58,42 @@ const AuthLayout = () => {
         };
 
         window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('deviceorientation', handleDeviceOrientation);
 
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('deviceorientation', handleDeviceOrientation);
+        const cleanupFns: Array<() => void> = [
+            () => window.removeEventListener('mousemove', handleMouseMove),
+        ];
+
+        const enableGyro = () => {
+            window.addEventListener('deviceorientation', handleDeviceOrientation);
+            cleanupFns.push(() => window.removeEventListener('deviceorientation', handleDeviceOrientation));
         };
+
+        const requestPermission = (window.DeviceOrientationEvent as (typeof DeviceOrientationEvent & {
+            requestPermission?: () => Promise<'granted' | 'denied'>;
+        }) | undefined)?.requestPermission;
+
+        if (typeof requestPermission === 'function') {
+            // iOS 13+ only fires deviceorientation after requestPermission() is
+            // called from inside a user gesture, so wait for the first tap/click.
+            const onFirstInteraction = () => {
+                requestPermission().then((state) => {
+                    if (state === 'granted') {
+                        enableGyro();
+                    }
+                }).catch(() => {});
+            };
+            window.addEventListener('touchend', onFirstInteraction, { once: true });
+            window.addEventListener('click', onFirstInteraction, { once: true });
+            cleanupFns.push(() => {
+                window.removeEventListener('touchend', onFirstInteraction);
+                window.removeEventListener('click', onFirstInteraction);
+            });
+        } else if (typeof window.DeviceOrientationEvent !== 'undefined') {
+            // Android and other browsers expose the event without a permission prompt.
+            enableGyro();
+        }
+
+        return () => cleanupFns.forEach((fn) => fn());
     }, [background]);
 
     return (
