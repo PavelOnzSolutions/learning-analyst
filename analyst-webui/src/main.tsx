@@ -13,7 +13,6 @@ import { ToolbarProvider } from './context/ToolbarContext';
 import { ToastProvider, useToast } from './context/ToastContext';
 import { PageTitleProvider } from './context/PageTitleContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import "./i18n";
 
 let toastFn: ((message: string, type?: 'error' | 'success' | 'info') => void) | null = null;
 
