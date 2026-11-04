@@ -1,34 +1,3 @@
-import {EAuditLogType} from "../models/audit-log.model.ts";
-import i18n from "../i18n.ts";
-
-/**
- * Converts an audit log type to a human-readable label.
- * @param type - The audit log type to convert.
- * @returns The human-readable label for the audit log type.
- */
-export const auditLogTypeToLabel = (type: EAuditLogType) => {
-    switch (type) {
-        case EAuditLogType.ENTITY_CHANGE:
-            return i18n.t('lbl_audit_log_type_entity_change', 'Entity Change');
-        case EAuditLogType.ENTITY_VERSION:
-            return i18n.t('lbl_audit_log_type_entity_version', 'Entity Version');
-        case EAuditLogType.USER_ACTION:
-            return i18n.t('lbl_audit_log_type_user_action', 'User Action');
-        case EAuditLogType.AUTHORIZATION:
-            return i18n.t('lbl_audit_log_type_authorization', 'Authorization');
-        case EAuditLogType.SYSTEM_EVENT:
-            return i18n.t('lbl_audit_log_type_system_event', 'System Event');
-        case EAuditLogType.DEPLOYMENT:
-            return i18n.t('lbl_audit_log_type_deployment', 'Deployment');
-        case EAuditLogType.BACKUP:
-            return i18n.t('lbl_audit_log_type_backup', 'Backup');
-        case EAuditLogType.RESTORE:
-            return i18n.t('lbl_audit_log_type_restore', 'Restore');
-        default:
-            return type;
-    }
-};
-
 /**
  * Maps a given credential type identifier to a formatted label.
  *
