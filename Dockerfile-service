@@ -1,0 +1,27 @@
+# ---- Build stage ----
+FROM eclipse-temurin:25-jdk AS build
+WORKDIR /workspace
+
+# Warm the Gradle cache: copy only build inputs first.
+COPY gradlew gradlew.bat settings.gradle.kts build.gradle.kts ./
+COPY gradle ./gradle
+COPY buildSrc ./buildSrc
+RUN chmod +x gradlew
+
+# Copy sources and build the boot jar (tests run in CI, not in the image build).
+COPY analyst-service ./analyst-service
+COPY analyst-webui ./analyst-webui
+RUN ./gradlew --no-daemon :analyst-service:bootJar -x test
+
+# ---- Runtime stage ----
+FROM eclipse-temurin:25-jre AS runtime
+WORKDIR /app
+
+# Non-root runtime user.
+RUN groupadd --system analyst && useradd --system --gid analyst --home /app analyst
+COPY --from=build /workspace/analyst-service/build/libs/*.jar /app/app.jar
+USER analyst
+
+EXPOSE 8080
+ENV JAVA_OPTS=""
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]

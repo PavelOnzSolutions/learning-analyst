@@ -6,8 +6,8 @@ interface OrgHeadcountChartProps {
     employees: IEmployeeSummary[];
 }
 
-const WIDTH = 300;
-const HEIGHT = 300;
+const WIDTH = 400;
+const HEIGHT = 200;
 const MARGIN = { top: 20, right: 10, bottom: 50, left: 30 };
 
 function countBy(employees: IEmployeeSummary[], key: 'utvar' | 'pozice'): { label: string; count: number }[] {
@@ -63,12 +63,12 @@ function BarGroup({ title, data, color }: { title: string; data: { label: string
                                     {count}
                                 </text>
                                 <text
-                                    x={bandX + xScale.bandwidth() / 2}
-                                    y={innerHeight + 15}
+                                    x={bandX + (xScale.bandwidth() / 2) - 10}
+                                    y={innerHeight + 25}
                                     textAnchor="middle"
                                     fontSize={10}
                                     fill="var(--gray-11)"
-                                    transform={`rotate(-30, ${bandX + xScale.bandwidth() / 2}, ${innerHeight + 15})`}
+                                    transform={`rotate(-35, ${bandX + xScale.bandwidth() / 2}, ${innerHeight + 15})`}
                                 >
                                     {label}
                                 </text>
@@ -90,7 +90,7 @@ export default function OrgHeadcountChart({ employees }: OrgHeadcountChartProps)
     const byPosition = countBy(employees, 'pozice');
 
     return (
-        <Flex gap="4" justify="center" wrap="wrap">
+        <Flex gap="4" justify="center" wrap="nowrap" direction="column">
             <BarGroup title="Headcount by Department" data={byDepartment} color="var(--accent-9)"/>
             <BarGroup title="Headcount by Position" data={byPosition} color="var(--cyan-9)"/>
         </Flex>

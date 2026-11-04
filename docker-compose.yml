@@ -1,0 +1,43 @@
+services:
+  mongodb:
+    image: mongo:8
+    container_name: analyst-mongodb
+    environment:
+      - 'MONGO_INITDB_DATABASE=analyst'
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  analyst-service:
+    image: analyst/service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-service
+    container_name: analyst-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongodb:
+        condition: service_started
+    environment:
+      - 'SPRING_DATA_MONGODB_DATABASE=analyst'
+      - 'SPRING_DATA_MONGODB_URI=mongodb://analyst-mongodb:27017/analyst'
+      - 'ANALYST_FRONTEND_BASE_URL=https://skoleni.zkrabice.cz'
+
+  analyst-webui:
+    image: analyst/webui:latest
+    build:
+      context: analyst-webui
+    container_name: analyst-webui
+    ports:
+      - "8008:80"
+    environment:
+      - 'VITE_BASE_URL=https://api.skoleni.zkrabice.cz'
+      - 'VITE_PROD=true'
+    depends_on:
+      analyst-service:
+        condition: service_started
+
+volumes:
+  mongodb_data:
